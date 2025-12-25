@@ -88,9 +88,9 @@ export async function GET(request: Request) {
       // Since we run daily, send reminder to anyone between 0-24 hours remaining
       if (hoursLeft > 0 && hoursLeft <= 24) {
         try {
-          // Generate a new verification link
+          // Generate a magic link for verification
           const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-            type: 'signup',
+            type: 'magiclink',
             email: user.email!,
             options: {
               redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
