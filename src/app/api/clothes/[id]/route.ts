@@ -1,16 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { getOrCreateAppUserFromSupabase } from '@/lib/user'
 import { normalizeClothingPayload } from '@/lib/clothing'
 
 type RouteContext = {
-  params: {
-    id: string
-  }
+  params: Promise<{ id: string }>
 }
 
-export async function PUT(request: Request, { params }: RouteContext) {
+export async function PUT(request: NextRequest, { params }: RouteContext) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -27,7 +26,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
 
     const appUser = await getOrCreateAppUserFromSupabase(user)
     const existing = await prisma.clothing.findFirst({
-      where: { id: params.id, userId: appUser.id },
+      where: { id, userId: appUser.id },
     })
 
     if (!existing) {
@@ -35,7 +34,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
     }
 
     const item = await prisma.clothing.update({
-      where: { id: params.id },
+      where: { id },
       data: normalized.data,
     })
 
@@ -46,7 +45,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
   }
 }
 
-export async function DELETE(request: Request, { params }: RouteContext) {
+export async function DELETE(request: NextRequest, { params }: RouteContext) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -57,14 +57,14 @@ export async function DELETE(request: Request, { params }: RouteContext) {
   try {
     const appUser = await getOrCreateAppUserFromSupabase(user)
     const existing = await prisma.clothing.findFirst({
-      where: { id: params.id, userId: appUser.id },
+      where: { id, userId: appUser.id },
     })
 
     if (!existing) {
       return NextResponse.json({ error: 'Item not found' }, { status: 404 })
     }
 
-    await prisma.clothing.delete({ where: { id: params.id } })
+    await prisma.clothing.delete({ where: { id } })
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error('Clothes DELETE error:', error)
