@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Card } from '@/components/ui'
 import { AvatarDisplay } from '@/components/avatar'
+import { useAvatar } from '@/hooks/useAvatar'
 
 interface ProfileClientProps {
   user: User
@@ -15,6 +16,7 @@ interface ProfileClientProps {
 export default function ProfileClient({ user }: ProfileClientProps) {
   const router = useRouter()
   const [showSettings, setShowSettings] = useState(false)
+  const { avatar } = useAvatar()
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -46,13 +48,30 @@ export default function ProfileClient({ user }: ProfileClientProps) {
         <Card variant="elevated" className="mb-6">
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 bg-blush rounded-full flex items-center justify-center mb-4">
-              <AvatarDisplay size="sm" />
+              <AvatarDisplay
+                size="sm"
+                skinTone={avatar?.skinTone}
+                hairColor={avatar?.hairColor}
+                hairHighlights={avatar?.hairHighlights}
+                hairStyle={avatar?.hairStyle}
+                eyeColor={avatar?.eyeColor}
+                faceShape={avatar?.faceShape}
+                bodyType={avatar?.bodyType}
+                height={avatar?.height}
+                accessories={avatar?.accessories}
+                showRotationControls={false}
+              />
             </div>
             <h2 className="text-xl font-bold text-charcoal">
               {user.user_metadata?.name || 'User'}
             </h2>
             <p className="text-taupe text-sm">{user.email}</p>
-            <Button variant="outline" size="sm" className="mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={() => router.push('/profile/avatar')}
+            >
               Edit Avatar
             </Button>
           </div>

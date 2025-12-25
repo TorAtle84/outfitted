@@ -108,16 +108,14 @@ export default function AddClothingModal({
   }
 
   const handleSubmit = () => {
-    if (formData.styles.length === 0) {
-      formData.styles = ['casual']
+    const data: ClothingFormData = {
+      ...formData,
+      styles: formData.styles.length > 0 ? formData.styles : ['casual'],
+      seasons: formData.seasons.length > 0 ? formData.seasons : ['spring', 'summer', 'fall', 'winter'],
+      occasions: formData.occasions.length > 0 ? formData.occasions : ['weekend'],
     }
-    if (formData.seasons.length === 0) {
-      formData.seasons = ['spring', 'summer', 'fall', 'winter']
-    }
-    if (formData.occasions.length === 0) {
-      formData.occasions = ['weekend']
-    }
-    onAdd(formData)
+
+    onAdd(data)
     resetForm()
   }
 

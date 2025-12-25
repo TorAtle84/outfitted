@@ -7,6 +7,7 @@ import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Card } from '@/components/ui'
 import AvatarDisplay from '@/components/avatar/AvatarDisplay'
+import { useAvatar } from '@/hooks/useAvatar'
 
 interface HomeClientProps {
   user: User
@@ -15,6 +16,7 @@ interface HomeClientProps {
 export default function HomeClient({ user }: HomeClientProps) {
   const router = useRouter()
   const [currentDay, setCurrentDay] = useState<'today' | 'tomorrow'>('today')
+  const { avatar, isLoading: isAvatarLoading } = useAvatar()
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -64,7 +66,7 @@ export default function HomeClient({ user }: HomeClientProps) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-charcoal">22°C</p>
+                <p className="text-2xl font-bold text-charcoal">22{'\u00B0'}C</p>
                 <p className="text-sm text-taupe">Partly cloudy</p>
               </div>
             </div>
@@ -109,7 +111,29 @@ export default function HomeClient({ user }: HomeClientProps) {
                 <h2 className="text-lg font-semibold text-charcoal mb-4">
                   Your Outfit for {currentDay === 'today' ? 'Today' : 'Tomorrow'}
                 </h2>
-                <AvatarDisplay />
+                <AvatarDisplay
+                  skinTone={avatar?.skinTone}
+                  hairColor={avatar?.hairColor}
+                  hairHighlights={avatar?.hairHighlights}
+                  hairStyle={avatar?.hairStyle}
+                  eyeColor={avatar?.eyeColor}
+                  faceShape={avatar?.faceShape}
+                  bodyType={avatar?.bodyType}
+                  height={avatar?.height}
+                  accessories={avatar?.accessories}
+                />
+                {!isAvatarLoading && !avatar && (
+                  <div className="mt-4 text-center">
+                    <p className="text-sm text-taupe mb-3">
+                      Create your avatar to see outfits on you.
+                    </p>
+                    <Link href="/profile/avatar">
+                      <Button variant="outline" size="sm">
+                        Create avatar
+                      </Button>
+                    </Link>
+                  </div>
+                )}
                 <div className="flex gap-4 mt-6">
                   <Button variant="outline" className="flex items-center gap-2">
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

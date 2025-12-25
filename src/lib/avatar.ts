@@ -81,12 +81,6 @@ function normalizeHexColor(value: unknown, fallback: string): string {
   return trimmed.toUpperCase()
 }
 
-function coerceEnum<T extends readonly string[]>(allowed: T, value: unknown, fallback: T[number]): T[number] {
-  if (typeof value !== 'string') return fallback
-  const normalized = value.trim()
-  return (allowed as readonly string[]).includes(normalized) ? (normalized as T[number]) : fallback
-}
-
 function normalizeAccessories(value: unknown): AccessoryType[] {
   if (!Array.isArray(value)) return []
   const unique = new Set<AccessoryType>()
@@ -164,4 +158,3 @@ export function avatarFromDb(avatar: {
     hairHighlights: avatar.hairHighlights ?? undefined,
   })
 }
-

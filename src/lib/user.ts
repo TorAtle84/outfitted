@@ -9,25 +9,12 @@ export async function getOrCreateAppUserFromSupabase(supabaseUser: SupabaseUser)
 
   const name = typeof supabaseUser.user_metadata?.name === 'string' ? supabaseUser.user_metadata.name : null
 
-  const existing = await prisma.user.findUnique({
+  return prisma.user.upsert({
     where: { email },
-  })
-
-  if (existing) {
-    if (!existing.name && name) {
-      return prisma.user.update({
-        where: { id: existing.id },
-        data: { name },
-      })
-    }
-    return existing
-  }
-
-  return prisma.user.create({
-    data: {
+    create: {
       email,
       name: name || undefined,
     },
+    update: name ? { name } : {},
   })
 }
-
