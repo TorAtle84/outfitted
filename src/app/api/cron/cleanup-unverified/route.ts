@@ -2,10 +2,9 @@ import { createClient } from '@supabase/supabase-js'
 import { sendEmail, emailTemplates } from '@/lib/email'
 import { NextResponse } from 'next/server'
 
-// This endpoint should be called by a cron job every hour
-// It checks for unverified users and sends reminders or deletes accounts
+// This endpoint runs daily at 6 AM (Vercel Hobby plan limitation)
+// It sends reminders to unverified users and deletes accounts past 24 hours
 
-const REMINDER_HOURS = [12, 6, 3, 1] // Hours before deletion to send reminders
 const DELETION_HOURS = 24 // Delete after 24 hours
 
 export async function GET(request: Request) {
@@ -85,44 +84,40 @@ export async function GET(request: Request) {
         continue
       }
 
-      // Check if we should send a reminder
-      for (const reminderHour of REMINDER_HOURS) {
-        // Send reminder if we're within the reminder window (±30 minutes)
-        const reminderWindow = Math.abs(hoursLeft - reminderHour)
-        if (reminderWindow <= 0.5) {
-          try {
-            // Generate a new verification link
-            const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-              type: 'signup',
-              email: user.email!,
-              options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-              },
-            })
+      // Send reminder to users who have less than 24 hours left (but not deleted yet)
+      // Since we run daily, send reminder to anyone between 0-24 hours remaining
+      if (hoursLeft > 0 && hoursLeft <= 24) {
+        try {
+          // Generate a new verification link
+          const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+            type: 'signup',
+            email: user.email!,
+            options: {
+              redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+            },
+          })
 
-            if (linkError || !linkData) {
-              results.errors.push(`Failed to generate link for ${user.email}`)
-              continue
-            }
-
-            const template = emailTemplates.verificationReminder(
-              user.email!,
-              Math.round(hoursLeft),
-              linkData.properties.action_link
-            )
-
-            await sendEmail({
-              to: user.email!,
-              subject: template.subject,
-              html: template.html,
-            })
-
-            results.reminders_sent++
-            console.log(`Sent ${reminderHour}h reminder to: ${user.email}`)
-          } catch (err) {
-            results.errors.push(`Error sending reminder to ${user.email}: ${err}`)
+          if (linkError || !linkData) {
+            results.errors.push(`Failed to generate link for ${user.email}`)
+            continue
           }
-          break // Only send one reminder per user per cron run
+
+          const template = emailTemplates.verificationReminder(
+            user.email!,
+            Math.round(hoursLeft),
+            linkData.properties.action_link
+          )
+
+          await sendEmail({
+            to: user.email!,
+            subject: template.subject,
+            html: template.html,
+          })
+
+          results.reminders_sent++
+          console.log(`Sent reminder to: ${user.email} (${Math.round(hoursLeft)}h left)`)
+        } catch (err) {
+          results.errors.push(`Error sending reminder to ${user.email}: ${err}`)
         }
       }
     }
