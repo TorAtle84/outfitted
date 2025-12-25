@@ -77,6 +77,18 @@ export default function RegisterPage() {
             Vi har sendt en bekreftelseslenke til <strong>{email}</strong>.
             Klikk på lenken for å aktivere kontoen din.
           </p>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold mb-2">
+              <span>⏰</span>
+              <span>Viktig!</span>
+            </div>
+            <p className="text-amber-700 text-sm">
+              Du må bekrefte e-posten din innen <strong>24 timer</strong>, ellers blir kontoen automatisk slettet.
+              Vi sender deg påminnelser hvis du glemmer det.
+            </p>
+          </div>
+
           <p className="text-sm text-taupe">
             Fant du ikke e-posten? Sjekk søppelpost-mappen din.
           </p>

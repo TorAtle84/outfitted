@@ -177,4 +177,73 @@ export const emailTemplates = {
       </div>
     `,
   }),
+
+  verificationReminder: (email: string, hoursLeft: number, verificationLink: string) => ({
+    subject: hoursLeft <= 1
+      ? `⚠️ SISTE SJANSE: Kontoen din slettes om ${hoursLeft} time!`
+      : `⚠️ Bekreft e-posten din - ${hoursLeft} timer igjen før kontoen slettes`,
+    html: `
+      <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
+        <div style="background: ${hoursLeft <= 3 ? '#DC2626' : '#F59E0B'}; color: white; padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
+          <strong style="font-size: 18px;">
+            ${hoursLeft <= 1 ? '⚠️ SISTE VARSEL!' : '⏰ Viktig påminnelse'}
+          </strong>
+        </div>
+
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">
+          ${hoursLeft <= 1 ? 'Kontoen din slettes snart!' : 'Bekreft e-posten din'}
+        </h1>
+
+        <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
+          Hei! Du har registrert deg på Outfitted med e-postadressen <strong>${email}</strong>,
+          men du har ikke bekreftet kontoen din ennå.
+        </p>
+
+        <div style="background: ${hoursLeft <= 3 ? '#FEE2E2' : '#FEF3C7'}; border-left: 4px solid ${hoursLeft <= 3 ? '#DC2626' : '#F59E0B'}; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0;">
+          <p style="color: #4A4A4A; font-size: 16px; margin: 0; font-weight: 600;">
+            ${hoursLeft <= 1
+              ? `Kontoen din og alle data slettes om ${hoursLeft} time!`
+              : `Du har ${hoursLeft} timer igjen på å bekrefte e-posten din.`}
+          </p>
+          <p style="color: #6B6B6B; font-size: 14px; margin: 8px 0 0 0;">
+            Ubekreftede kontoer slettes automatisk etter 24 timer.
+          </p>
+        </div>
+
+        <a href="${verificationLink}"
+           style="display: inline-block; background: #D4A5A5; color: white; padding: 16px 32px;
+                  border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin: 20px 0;">
+          Bekreft e-posten min nå
+        </a>
+
+        <p style="color: #9B9B9B; font-size: 14px; margin-top: 32px;">
+          Hvis du ikke har registrert deg på Outfitted, kan du ignorere denne e-posten.
+        </p>
+      </div>
+    `,
+  }),
+
+  accountDeleted: (email: string) => ({
+    subject: 'Din Outfitted-konto er slettet',
+    html: `
+      <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Kontoen din er slettet</h1>
+
+        <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
+          Kontoen tilknyttet <strong>${email}</strong> har blitt slettet fordi e-postadressen
+          ikke ble bekreftet innen 24 timer.
+        </p>
+
+        <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6; margin-top: 20px;">
+          Du er velkommen til å registrere deg på nytt når som helst!
+        </p>
+
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/register"
+           style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
+                  border-radius: 8px; text-decoration: none; margin-top: 20px; font-weight: 500;">
+          Registrer deg på nytt
+        </a>
+      </div>
+    `,
+  }),
 }
