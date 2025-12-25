@@ -1,31 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input, Card } from '@/components/ui'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
+      setError('Passordene stemmer ikke overens')
       return
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters')
+      setError('Passordet må være minst 6 tegn')
       return
     }
 
@@ -40,6 +39,7 @@ export default function RegisterPage() {
         data: {
           name,
         },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
 
@@ -49,51 +49,87 @@ export default function RegisterPage() {
       return
     }
 
-    // Redirect to avatar creation after successful registration
-    router.push('/home?welcome=true')
-    router.refresh()
+    // Send welcome email
+    try {
+      await fetch('/api/email/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name }),
+      })
+    } catch {
+      // Don't fail registration if welcome email fails
+      console.error('Could not send welcome email')
+    }
+
+    setSuccess(true)
+    setIsLoading(false)
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center p-4">
+        <Card variant="elevated" className="w-full max-w-md text-center">
+          <div className="text-5xl mb-4">📧</div>
+          <h1 className="text-2xl font-bold text-charcoal mb-4">
+            Sjekk e-posten din!
+          </h1>
+          <p className="text-taupe mb-6">
+            Vi har sendt en bekreftelseslenke til <strong>{email}</strong>.
+            Klikk på lenken for å aktivere kontoen din.
+          </p>
+          <p className="text-sm text-taupe">
+            Fant du ikke e-posten? Sjekk søppelpost-mappen din.
+          </p>
+          <Link href="/login">
+            <Button variant="secondary" className="mt-6">
+              Tilbake til innlogging
+            </Button>
+          </Link>
+        </Card>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-cream flex items-center justify-center p-4">
       <Card variant="elevated" className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-charcoal mb-2">Create your account</h1>
-          <p className="text-taupe">Join Outfitted and perfect your wardrobe</p>
+          <h1 className="text-3xl font-bold text-charcoal mb-2">Opprett konto</h1>
+          <p className="text-taupe">Bli med i Outfitted og perfeksjoner garderoben din</p>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <Input
-            label="Name"
+            label="Navn"
             type="text"
-            placeholder="Your name"
+            placeholder="Ditt navn"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
 
           <Input
-            label="Email"
+            label="E-post"
             type="email"
-            placeholder="you@example.com"
+            placeholder="din@epost.no"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
 
           <Input
-            label="Password"
+            label="Passord"
             type="password"
-            placeholder="At least 6 characters"
+            placeholder="Minst 6 tegn"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
           <Input
-            label="Confirm Password"
+            label="Bekreft passord"
             type="password"
-            placeholder="Confirm your password"
+            placeholder="Skriv passordet på nytt"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -111,21 +147,21 @@ export default function RegisterPage() {
             size="lg"
             isLoading={isLoading}
           >
-            Create account
+            Opprett konto
           </Button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-taupe">
-            Already have an account?{' '}
+            Har du allerede en konto?{' '}
             <Link href="/login" className="text-rose hover:underline font-medium">
-              Sign in
+              Logg inn
             </Link>
           </p>
         </div>
 
         <p className="mt-4 text-xs text-center text-taupe">
-          By creating an account, you agree to our Terms of Service and Privacy Policy.
+          Ved å opprette en konto godtar du våre vilkår og personvernerklæring.
         </p>
       </Card>
     </div>
