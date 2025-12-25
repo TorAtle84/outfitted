@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button, Card } from '@/components/ui'
 import AvatarDisplay from './AvatarDisplay'
-import type { AvatarCustomization, BodyType, HairStyle, FaceShape } from '@/types'
+import type { AccessoryType, AvatarCustomization, BodyType, FaceShape, HairStyle } from '@/types'
 
 interface AvatarCreatorProps {
   initialData?: Partial<AvatarCustomization>
@@ -23,8 +23,10 @@ const HAIR_STYLES: { value: HairStyle; label: string }[] = [
   { value: 'short-straight', label: 'Short Straight' },
   { value: 'short-curly', label: 'Short Curly' },
   { value: 'medium-straight', label: 'Medium Straight' },
+  { value: 'medium-curly', label: 'Medium Curly' },
   { value: 'medium-wavy', label: 'Medium Wavy' },
   { value: 'long-straight', label: 'Long Straight' },
+  { value: 'long-curly', label: 'Long Curly' },
   { value: 'long-wavy', label: 'Long Wavy' },
   { value: 'bob', label: 'Bob' },
   { value: 'ponytail', label: 'Ponytail' },
@@ -61,6 +63,71 @@ const EYE_COLORS = [
   '#4169E1', '#6495ED', '#808080', '#4682B4',
 ]
 
+const ACCESSORY_OPTIONS: { category: string; items: { value: AccessoryType; label: string }[] }[] = [
+  {
+    category: 'Glasses',
+    items: [
+      { value: 'glasses-round', label: 'Round' },
+      { value: 'glasses-square', label: 'Square' },
+      { value: 'glasses-cat-eye', label: 'Cat-eye' },
+      { value: 'glasses-aviator', label: 'Aviator' },
+      { value: 'sunglasses', label: 'Sunglasses' },
+    ],
+  },
+  {
+    category: 'Earrings',
+    items: [
+      { value: 'earrings-stud', label: 'Stud' },
+      { value: 'earrings-hoop', label: 'Hoop' },
+      { value: 'earrings-drop', label: 'Drop' },
+    ],
+  },
+  {
+    category: 'Necklaces',
+    items: [
+      { value: 'necklace-chain', label: 'Chain' },
+      { value: 'necklace-pendant', label: 'Pendant' },
+      { value: 'necklace-choker', label: 'Choker' },
+    ],
+  },
+  {
+    category: 'Wrist',
+    items: [
+      { value: 'watch-classic', label: 'Classic Watch' },
+      { value: 'watch-smart', label: 'Smart Watch' },
+      { value: 'bracelet', label: 'Bracelet' },
+    ],
+  },
+  {
+    category: 'Hats',
+    items: [
+      { value: 'hat-beanie', label: 'Beanie' },
+      { value: 'hat-cap', label: 'Cap' },
+      { value: 'hat-fedora', label: 'Fedora' },
+    ],
+  },
+]
+
+const ACCESSORY_CATEGORY: Record<AccessoryType, string> = {
+  'glasses-round': 'Glasses',
+  'glasses-square': 'Glasses',
+  'glasses-cat-eye': 'Glasses',
+  'glasses-aviator': 'Glasses',
+  'sunglasses': 'Glasses',
+  'earrings-stud': 'Earrings',
+  'earrings-hoop': 'Earrings',
+  'earrings-drop': 'Earrings',
+  'necklace-chain': 'Necklaces',
+  'necklace-pendant': 'Necklaces',
+  'necklace-choker': 'Necklaces',
+  'watch-classic': 'Wrist',
+  'watch-smart': 'Wrist',
+  bracelet: 'Wrist',
+  'hat-beanie': 'Hats',
+  'hat-cap': 'Hats',
+  'hat-fedora': 'Hats',
+}
+
 export default function AvatarCreator({
   initialData,
   onSave,
@@ -83,6 +150,18 @@ export default function AvatarCreator({
     setAvatar((prev) => ({ ...prev, ...updates }))
   }
 
+  const toggleAccessory = (accessory: AccessoryType) => {
+    setAvatar((prev) => {
+      const category = ACCESSORY_CATEGORY[accessory]
+      const withoutCategory = prev.accessories.filter((a) => ACCESSORY_CATEGORY[a] !== category)
+      const isSelected = prev.accessories.includes(accessory)
+      return {
+        ...prev,
+        accessories: isSelected ? withoutCategory : [...withoutCategory, accessory],
+      }
+    })
+  }
+
   const handleSave = () => {
     onSave?.(avatar)
   }
@@ -95,225 +174,332 @@ export default function AvatarCreator({
   ] as const
 
   return (
-    <div className="min-h-screen bg-cream p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-charcoal text-center mb-6">
-          Create Your Avatar
-        </h1>
+    <div className="grid lg:grid-cols-2 gap-8">
+      {/* Preview */}
+      <Card variant="elevated" className="flex items-center justify-center py-8">
+        <AvatarDisplay
+          skinTone={avatar.skinTone}
+          hairColor={avatar.hairColor}
+          hairHighlights={avatar.hairHighlights}
+          hairStyle={avatar.hairStyle}
+          eyeColor={avatar.eyeColor}
+          faceShape={avatar.faceShape}
+          bodyType={avatar.bodyType}
+          height={avatar.height}
+          accessories={avatar.accessories}
+          size="lg"
+          showRotationControls
+        />
+      </Card>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Preview */}
-          <Card variant="elevated" className="flex items-center justify-center py-8">
-            <AvatarDisplay
-              skinTone={avatar.skinTone}
-              hairColor={avatar.hairColor}
-              hairStyle={avatar.hairStyle}
-              eyeColor={avatar.eyeColor}
-              bodyType={avatar.bodyType}
-              size="lg"
-            />
-          </Card>
+      {/* Controls */}
+      <Card variant="elevated">
+        {/* Tabs */}
+        <div className="flex border-b border-beige mb-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'text-rose border-b-2 border-rose'
+                  : 'text-taupe hover:text-charcoal'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          {/* Controls */}
-          <Card variant="elevated">
-            {/* Tabs */}
-            <div className="flex border-b border-beige mb-6">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'text-rose border-b-2 border-rose'
-                      : 'text-taupe hover:text-charcoal'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+        {/* Tab Content */}
+        <div className="space-y-6">
+          {activeTab === 'body' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Body Type
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {BODY_TYPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ bodyType: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.bodyType === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {/* Tab Content */}
-            <div className="space-y-6">
-              {activeTab === 'body' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Body Type
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {BODY_TYPES.map(({ value, label }) => (
-                        <button
-                          key={value}
-                          onClick={() => updateAvatar({ bodyType: value })}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                            avatar.bodyType === value
-                              ? 'bg-rose text-white'
-                              : 'bg-beige text-charcoal hover:bg-blush'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Height: {avatar.height} cm
+                </label>
+                <input
+                  type="range"
+                  min="140"
+                  max="200"
+                  value={avatar.height}
+                  onChange={(e) => updateAvatar({ height: parseInt(e.target.value) })}
+                  className="w-full h-2 bg-beige rounded-lg appearance-none cursor-pointer accent-rose"
+                />
+                <div className="flex justify-between text-xs text-taupe mt-1">
+                  <span>140 cm</span>
+                  <span>200 cm</span>
+                </div>
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Height: {avatar.height} cm
-                    </label>
-                    <input
-                      type="range"
-                      min="140"
-                      max="200"
-                      value={avatar.height}
-                      onChange={(e) => updateAvatar({ height: parseInt(e.target.value) })}
-                      className="w-full h-2 bg-beige rounded-lg appearance-none cursor-pointer accent-rose"
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Skin Tone
+                </label>
+                <div className="flex items-center gap-3 mb-3">
+                  <input
+                    type="color"
+                    value={avatar.skinTone}
+                    onChange={(e) => updateAvatar({ skinTone: e.target.value })}
+                    className="h-10 w-12 rounded-md border border-beige bg-white p-1"
+                    aria-label="Pick skin tone"
+                  />
+                  <span className="text-xs text-taupe">{avatar.skinTone}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {SKIN_TONES.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => updateAvatar({ skinTone: color })}
+                      className={`w-10 h-10 rounded-full border-2 transition-all ${
+                        avatar.skinTone === color
+                          ? 'border-rose scale-110'
+                          : 'border-transparent hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      aria-label={`Skin tone ${color}`}
                     />
-                    <div className="flex justify-between text-xs text-taupe mt-1">
-                      <span>140 cm</span>
-                      <span>200 cm</span>
-                    </div>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Skin Tone
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {SKIN_TONES.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => updateAvatar({ skinTone: color })}
-                          className={`w-10 h-10 rounded-full border-2 transition-all ${
-                            avatar.skinTone === color
-                              ? 'border-rose scale-110'
-                              : 'border-transparent hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          aria-label={`Skin tone ${color}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+          {activeTab === 'face' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Face Shape
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {FACE_SHAPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ faceShape: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.faceShape === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-              {activeTab === 'face' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Face Shape
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {FACE_SHAPES.map(({ value, label }) => (
-                        <button
-                          key={value}
-                          onClick={() => updateAvatar({ faceShape: value })}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                            avatar.faceShape === value
-                              ? 'bg-rose text-white'
-                              : 'bg-beige text-charcoal hover:bg-blush'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Eye Color
+                </label>
+                <div className="flex items-center gap-3 mb-3">
+                  <input
+                    type="color"
+                    value={avatar.eyeColor}
+                    onChange={(e) => updateAvatar({ eyeColor: e.target.value })}
+                    className="h-10 w-12 rounded-md border border-beige bg-white p-1"
+                    aria-label="Pick eye color"
+                  />
+                  <span className="text-xs text-taupe">{avatar.eyeColor}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {EYE_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => updateAvatar({ eyeColor: color })}
+                      className={`w-10 h-10 rounded-full border-2 transition-all ${
+                        avatar.eyeColor === color
+                          ? 'border-rose scale-110'
+                          : 'border-transparent hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      aria-label={`Eye color ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Eye Color
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {EYE_COLORS.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => updateAvatar({ eyeColor: color })}
-                          className={`w-10 h-10 rounded-full border-2 transition-all ${
-                            avatar.eyeColor === color
-                              ? 'border-rose scale-110'
-                              : 'border-transparent hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          aria-label={`Eye color ${color}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+          {activeTab === 'hair' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Hair Style
+                </label>
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                  {HAIR_STYLES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ hairStyle: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.hairStyle === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-              {activeTab === 'hair' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Hair Style
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                      {HAIR_STYLES.map(({ value, label }) => (
-                        <button
-                          key={value}
-                          onClick={() => updateAvatar({ hairStyle: value })}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                            avatar.hairStyle === value
-                              ? 'bg-rose text-white'
-                              : 'bg-beige text-charcoal hover:bg-blush'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Hair Color
+                </label>
+                <div className="flex items-center gap-3 mb-3">
+                  <input
+                    type="color"
+                    value={avatar.hairColor}
+                    onChange={(e) => updateAvatar({ hairColor: e.target.value })}
+                    className="h-10 w-12 rounded-md border border-beige bg-white p-1"
+                    aria-label="Pick hair color"
+                  />
+                  <span className="text-xs text-taupe">{avatar.hairColor}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {HAIR_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => updateAvatar({ hairColor: color })}
+                      className={`w-10 h-10 rounded-full border-2 transition-all ${
+                        avatar.hairColor === color
+                          ? 'border-rose scale-110'
+                          : 'border-transparent hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      aria-label={`Hair color ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-charcoal mb-3">
-                      Hair Color
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {HAIR_COLORS.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => updateAvatar({ hairColor: color })}
-                          className={`w-10 h-10 rounded-full border-2 transition-all ${
-                            avatar.hairColor === color
-                              ? 'border-rose scale-110'
-                              : 'border-transparent hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          aria-label={`Hair color ${color}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-charcoal">
+                    Highlights
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => updateAvatar({ hairHighlights: avatar.hairHighlights ? undefined : '#DEB887' })}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                      avatar.hairHighlights
+                        ? 'bg-rose text-white'
+                        : 'bg-beige text-charcoal hover:bg-blush'
+                    }`}
+                  >
+                    {avatar.hairHighlights ? 'On' : 'Off'}
+                  </button>
+                </div>
 
-              {activeTab === 'accessories' && (
-                <div className="text-center py-8">
-                  <p className="text-taupe">
-                    Accessories coming soon! Add glasses, earrings, watches, and more.
+                {avatar.hairHighlights && (
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={avatar.hairHighlights}
+                      onChange={(e) => updateAvatar({ hairHighlights: e.target.value })}
+                      className="h-10 w-12 rounded-md border border-beige bg-white p-1"
+                      aria-label="Pick highlight color"
+                    />
+                    <span className="text-xs text-taupe">{avatar.hairHighlights}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateAvatar({ hairHighlights: undefined })}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {activeTab === 'accessories' && (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-charcoal">Accessories</p>
+                  <p className="text-xs text-taupe">
+                    {avatar.accessories.length} selected
                   </p>
                 </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-4 mt-8 pt-6 border-t border-beige">
-              {onCancel && (
-                <Button variant="outline" className="flex-1" onClick={onCancel}>
-                  Cancel
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => updateAvatar({ accessories: [] })}
+                >
+                  Clear
                 </Button>
-              )}
-              <Button className="flex-1" onClick={handleSave}>
-                Save Avatar
-              </Button>
-            </div>
-          </Card>
+              </div>
+
+              <div className="space-y-5">
+                {ACCESSORY_OPTIONS.map((group) => (
+                  <div key={group.category}>
+                    <p className="text-sm font-medium text-charcoal mb-2">{group.category}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.items.map((item) => {
+                        const selected = avatar.accessories.includes(item.value)
+                        return (
+                          <button
+                            key={item.value}
+                            type="button"
+                            onClick={() => toggleAccessory(item.value)}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                              selected
+                                ? 'bg-rose text-white'
+                                : 'bg-beige text-charcoal hover:bg-blush'
+                            }`}
+                          >
+                            {item.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
-      </div>
+
+        {/* Actions */}
+        <div className="flex gap-4 mt-8 pt-6 border-t border-beige">
+          {onCancel && (
+            <Button variant="outline" className="flex-1" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+          <Button className="flex-1" onClick={handleSave}>
+            Save Avatar
+          </Button>
+        </div>
+      </Card>
     </div>
   )
 }
