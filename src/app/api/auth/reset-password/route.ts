@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json(
-        { error: 'E-postadresse er påkrevd' },
+        { error: 'Email address is required' },
         { status: 400 }
       )
     }
@@ -21,18 +21,18 @@ export async function POST(request: Request) {
     if (error) {
       console.error('Password reset error:', error)
       return NextResponse.json(
-        { error: 'Kunne ikke sende tilbakestillingslenke' },
+        { error: 'Could not send reset link' },
         { status: 500 }
       )
     }
 
     return NextResponse.json({
-      message: 'Hvis e-postadressen finnes, har vi sendt en lenke for å tilbakestille passordet.',
+      message: 'If the email address exists, we have sent a password reset link.',
     })
   } catch (error) {
     console.error('Password reset error:', error)
     return NextResponse.json(
-      { error: 'En feil oppstod' },
+      { error: 'An error occurred' },
       { status: 500 }
     )
   }

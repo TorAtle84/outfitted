@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
         setMessage(data.message)
       }
     } catch {
-      setError('En feil oppstod. Prøv igjen.')
+      setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -42,10 +42,10 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <h1 className="text-2xl font-semibold text-charcoal-soft text-center mb-2">
-            Glemt passord?
+            Forgot password?
           </h1>
           <p className="text-warm-taupe text-center mb-8">
-            Skriv inn e-postadressen din, så sender vi deg en lenke for å tilbakestille passordet.
+            Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
 
           {message && (
@@ -62,23 +62,23 @@ export default function ForgotPasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="E-post"
+              label="Email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="din@epost.no"
+              placeholder="you@example.com"
               required
             />
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Sender...' : 'Send tilbakestillingslenke'}
+              {isLoading ? 'Sending...' : 'Send reset link'}
             </Button>
           </form>
 
           <p className="text-center mt-6 text-warm-taupe">
-            Husker du passordet?{' '}
+            Remember your password?{' '}
             <Link href="/login" className="text-dusty-rose hover:underline">
-              Logg inn
+              Sign in
             </Link>
           </p>
         </div>

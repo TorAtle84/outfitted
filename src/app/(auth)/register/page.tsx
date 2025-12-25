@@ -19,12 +19,12 @@ export default function RegisterPage() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError('Passordene stemmer ikke overens')
+      setError('Passwords do not match')
       return
     }
 
     if (password.length < 6) {
-      setError('Passordet må være minst 6 tegn')
+      setError('Password must be at least 6 characters')
       return
     }
 
@@ -71,30 +71,30 @@ export default function RegisterPage() {
         <Card variant="elevated" className="w-full max-w-md text-center">
           <div className="text-5xl mb-4">📧</div>
           <h1 className="text-2xl font-bold text-charcoal mb-4">
-            Sjekk e-posten din!
+            Check your email!
           </h1>
           <p className="text-taupe mb-6">
-            Vi har sendt en bekreftelseslenke til <strong>{email}</strong>.
-            Klikk på lenken for å aktivere kontoen din.
+            We&apos;ve sent a confirmation link to <strong>{email}</strong>.
+            Click the link to activate your account.
           </p>
 
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-center gap-2 text-amber-700 font-semibold mb-2">
               <span>⏰</span>
-              <span>Viktig!</span>
+              <span>Important!</span>
             </div>
             <p className="text-amber-700 text-sm">
-              Du må bekrefte e-posten din innen <strong>24 timer</strong>, ellers blir kontoen automatisk slettet.
-              Vi sender deg påminnelser hvis du glemmer det.
+              You must verify your email within <strong>24 hours</strong>, or your account will be automatically deleted.
+              We&apos;ll send you reminders if you forget.
             </p>
           </div>
 
           <p className="text-sm text-taupe">
-            Fant du ikke e-posten? Sjekk søppelpost-mappen din.
+            Can&apos;t find the email? Check your spam folder.
           </p>
           <Link href="/login">
             <Button variant="secondary" className="mt-6">
-              Tilbake til innlogging
+              Back to login
             </Button>
           </Link>
         </Card>
@@ -106,42 +106,42 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-cream flex items-center justify-center p-4">
       <Card variant="elevated" className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-charcoal mb-2">Opprett konto</h1>
-          <p className="text-taupe">Bli med i Outfitted og perfeksjoner garderoben din</p>
+          <h1 className="text-3xl font-bold text-charcoal mb-2">Create account</h1>
+          <p className="text-taupe">Join Outfitted and perfect your wardrobe</p>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <Input
-            label="Navn"
+            label="Name"
             type="text"
-            placeholder="Ditt navn"
+            placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
 
           <Input
-            label="E-post"
+            label="Email"
             type="email"
-            placeholder="din@epost.no"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
 
           <Input
-            label="Passord"
+            label="Password"
             type="password"
-            placeholder="Minst 6 tegn"
+            placeholder="At least 6 characters"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
           <Input
-            label="Bekreft passord"
+            label="Confirm password"
             type="password"
-            placeholder="Skriv passordet på nytt"
+            placeholder="Re-enter your password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -159,21 +159,21 @@ export default function RegisterPage() {
             size="lg"
             isLoading={isLoading}
           >
-            Opprett konto
+            Create account
           </Button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-taupe">
-            Har du allerede en konto?{' '}
+            Already have an account?{' '}
             <Link href="/login" className="text-rose hover:underline font-medium">
-              Logg inn
+              Sign in
             </Link>
           </p>
         </div>
 
         <p className="mt-4 text-xs text-center text-taupe">
-          Ved å opprette en konto godtar du våre vilkår og personvernerklæring.
+          By creating an account, you agree to our Terms of Service and Privacy Policy.
         </p>
       </Card>
     </div>

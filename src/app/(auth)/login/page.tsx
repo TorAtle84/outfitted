@@ -64,7 +64,7 @@ export default function LoginPage() {
 
           <div className="text-right">
             <Link href="/forgot-password" className="text-sm text-rose hover:underline">
-              Glemt passord?
+              Forgot password?
             </Link>
           </div>
 

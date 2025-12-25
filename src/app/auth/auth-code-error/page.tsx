@@ -7,34 +7,34 @@ export default function AuthCodeErrorPage() {
       <Card variant="elevated" className="w-full max-w-md text-center">
         <div className="text-6xl mb-6">⚠️</div>
         <h1 className="text-2xl font-bold text-charcoal mb-4">
-          Noe gikk galt
+          Something went wrong
         </h1>
         <p className="text-taupe mb-6">
-          Vi kunne ikke bekrefte lenken din. Dette kan skje hvis:
+          We couldn&apos;t verify your link. This can happen if:
         </p>
         <ul className="text-left text-taupe mb-8 space-y-2">
           <li className="flex items-start gap-2">
             <span className="text-rose">•</span>
-            <span>Lenken har utløpt (de er gyldige i 24 timer)</span>
+            <span>The link has expired (they&apos;re valid for 24 hours)</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-rose">•</span>
-            <span>Lenken allerede har blitt brukt</span>
+            <span>The link has already been used</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-rose">•</span>
-            <span>Det oppstod en teknisk feil</span>
+            <span>A technical error occurred</span>
           </li>
         </ul>
         <div className="space-y-3">
           <Link href="/register">
             <Button className="w-full" size="lg">
-              Registrer deg på nytt
+              Register again
             </Button>
           </Link>
           <Link href="/login">
             <Button variant="secondary" className="w-full">
-              Gå til innlogging
+              Go to login
             </Button>
           </Link>
         </div>

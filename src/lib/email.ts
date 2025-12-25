@@ -32,119 +32,119 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
 // Email templates
 export const emailTemplates = {
   welcome: (name: string) => ({
-    subject: 'Velkommen til Outfitted!',
+    subject: 'Welcome to Outfitted!',
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Velkommen til Outfitted, ${name}!</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Welcome to Outfitted, ${name}!</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Vi er glade for å ha deg med! Med Outfitted kan du:
+          We're excited to have you! With Outfitted you can:
         </p>
         <ul style="color: #6B6B6B; font-size: 16px; line-height: 1.8;">
-          <li>Organisere garderoben din digitalt</li>
-          <li>Få AI-drevne antrekksforslag</li>
-          <li>Planlegge antrekk for reiser</li>
-          <li>Dele og få tilbakemelding fra venner</li>
+          <li>Organize your wardrobe digitally</li>
+          <li>Get AI-powered outfit suggestions</li>
+          <li>Plan outfits for trips</li>
+          <li>Share and get feedback from friends</li>
         </ul>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/home"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; margin-top: 20px; font-weight: 500;">
-          Kom i gang
+          Get started
         </a>
         <p style="color: #9B9B9B; font-size: 14px; margin-top: 32px;">
-          Med vennlig hilsen,<br>Outfitted-teamet
+          Best regards,<br>The Outfitted team
         </p>
       </div>
     `,
   }),
 
   passwordReset: (resetLink: string) => ({
-    subject: 'Tilbakestill passordet ditt - Outfitted',
+    subject: 'Reset your password - Outfitted',
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Tilbakestill passord</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Reset password</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Du har bedt om å tilbakestille passordet ditt. Klikk på knappen under for å velge et nytt passord.
+          You have requested to reset your password. Click the button below to choose a new password.
         </p>
         <a href="${resetLink}"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; margin-top: 20px; font-weight: 500;">
-          Tilbakestill passord
+          Reset password
         </a>
         <p style="color: #9B9B9B; font-size: 14px; margin-top: 32px;">
-          Hvis du ikke ba om dette, kan du ignorere denne e-posten.
+          If you did not request this, you can ignore this email.
         </p>
         <p style="color: #9B9B9B; font-size: 14px;">
-          Lenken utløper om 1 time.
+          The link expires in 1 hour.
         </p>
       </div>
     `,
   }),
 
   dailyOutfitSuggestion: (name: string, weather: string, suggestion: string) => ({
-    subject: `God morgen, ${name}! Her er dagens antrekksforslag`,
+    subject: `Good morning, ${name}! Here's your outfit suggestion for today`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">God morgen, ${name}!</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Good morning, ${name}!</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          <strong>Været i dag:</strong> ${weather}
+          <strong>Today's weather:</strong> ${weather}
         </p>
         <div style="background: white; padding: 24px; border-radius: 8px; margin: 20px 0; border: 1px solid #E8E4E0;">
-          <h3 style="color: #4A4A4A; margin-top: 0;">Dagens antrekksforslag</h3>
+          <h3 style="color: #4A4A4A; margin-top: 0;">Today's outfit suggestion</h3>
           <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">${suggestion}</p>
         </div>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/home"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; font-weight: 500;">
-          Se alle antrekk
+          View all outfits
         </a>
       </div>
     `,
   }),
 
   tripReminder: (name: string, destination: string, startDate: string) => ({
-    subject: `Påminnelse: Reisen til ${destination} starter i morgen!`,
+    subject: `Reminder: Your trip to ${destination} starts tomorrow!`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Klar for reisen, ${name}?</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Ready for your trip, ${name}?</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Reisen din til <strong>${destination}</strong> starter i morgen (${startDate}).
+          Your trip to <strong>${destination}</strong> starts tomorrow (${startDate}).
         </p>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Sjekk at du har planlagt alle antrekkene dine!
+          Make sure you've planned all your outfits!
         </p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/trip"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; margin-top: 20px; font-weight: 500;">
-          Se reiseplan
+          View trip plan
         </a>
       </div>
     `,
   }),
 
   newFollower: (name: string, followerName: string) => ({
-    subject: `${followerName} følger deg nå på Outfitted`,
+    subject: `${followerName} is now following you on Outfitted`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Ny følger!</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">New follower!</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Hei ${name}, <strong>${followerName}</strong> følger deg nå på Outfitted!
+          Hi ${name}, <strong>${followerName}</strong> is now following you on Outfitted!
         </p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/feed"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; margin-top: 20px; font-weight: 500;">
-          Se profilen
+          View profile
         </a>
       </div>
     `,
   }),
 
   newComment: (name: string, commenterName: string, comment: string) => ({
-    subject: `${commenterName} kommenterte på antrekket ditt`,
+    subject: `${commenterName} commented on your outfit`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Ny kommentar!</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">New comment!</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Hei ${name}, <strong>${commenterName}</strong> kommenterte på antrekket ditt:
+          Hi ${name}, <strong>${commenterName}</strong> commented on your outfit:
         </p>
         <div style="background: white; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #D4A5A5;">
           <p style="color: #6B6B6B; font-style: italic; margin: 0;">"${comment}"</p>
@@ -152,19 +152,19 @@ export const emailTemplates = {
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/feed"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; font-weight: 500;">
-          Se innlegget
+          View post
         </a>
       </div>
     `,
   }),
 
   newRating: (name: string, stars: number) => ({
-    subject: `Noen ga antrekket ditt ${stars} stjerner!`,
+    subject: `Someone gave your outfit ${stars} stars!`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Ny vurdering!</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">New rating!</h1>
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Hei ${name}, noen vurderte antrekket ditt:
+          Hi ${name}, someone rated your outfit:
         </p>
         <p style="font-size: 32px; margin: 20px 0;">
           ${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}
@@ -172,7 +172,7 @@ export const emailTemplates = {
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/feed"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; font-weight: 500;">
-          Se innlegget
+          View post
         </a>
       </div>
     `,
@@ -180,68 +180,68 @@ export const emailTemplates = {
 
   verificationReminder: (email: string, hoursLeft: number, verificationLink: string) => ({
     subject: hoursLeft <= 1
-      ? `⚠️ SISTE SJANSE: Kontoen din slettes om ${hoursLeft} time!`
-      : `⚠️ Bekreft e-posten din - ${hoursLeft} timer igjen før kontoen slettes`,
+      ? `⚠️ LAST CHANCE: Your account will be deleted in ${hoursLeft} hour!`
+      : `⚠️ Verify your email - ${hoursLeft} hours left before account deletion`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
         <div style="background: ${hoursLeft <= 3 ? '#DC2626' : '#F59E0B'}; color: white; padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
           <strong style="font-size: 18px;">
-            ${hoursLeft <= 1 ? '⚠️ SISTE VARSEL!' : '⏰ Viktig påminnelse'}
+            ${hoursLeft <= 1 ? '⚠️ FINAL WARNING!' : '⏰ Important reminder'}
           </strong>
         </div>
 
         <h1 style="color: #4A4A4A; margin-bottom: 24px;">
-          ${hoursLeft <= 1 ? 'Kontoen din slettes snart!' : 'Bekreft e-posten din'}
+          ${hoursLeft <= 1 ? 'Your account will be deleted soon!' : 'Verify your email'}
         </h1>
 
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Hei! Du har registrert deg på Outfitted med e-postadressen <strong>${email}</strong>,
-          men du har ikke bekreftet kontoen din ennå.
+          Hi! You registered on Outfitted with the email address <strong>${email}</strong>,
+          but you haven't verified your account yet.
         </p>
 
         <div style="background: ${hoursLeft <= 3 ? '#FEE2E2' : '#FEF3C7'}; border-left: 4px solid ${hoursLeft <= 3 ? '#DC2626' : '#F59E0B'}; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0;">
           <p style="color: #4A4A4A; font-size: 16px; margin: 0; font-weight: 600;">
             ${hoursLeft <= 1
-              ? `Kontoen din og alle data slettes om ${hoursLeft} time!`
-              : `Du har ${hoursLeft} timer igjen på å bekrefte e-posten din.`}
+              ? `Your account and all data will be deleted in ${hoursLeft} hour!`
+              : `You have ${hoursLeft} hours left to verify your email.`}
           </p>
           <p style="color: #6B6B6B; font-size: 14px; margin: 8px 0 0 0;">
-            Ubekreftede kontoer slettes automatisk etter 24 timer.
+            Unverified accounts are automatically deleted after 24 hours.
           </p>
         </div>
 
         <a href="${verificationLink}"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 16px 32px;
                   border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin: 20px 0;">
-          Bekreft e-posten min nå
+          Verify my email now
         </a>
 
         <p style="color: #9B9B9B; font-size: 14px; margin-top: 32px;">
-          Hvis du ikke har registrert deg på Outfitted, kan du ignorere denne e-posten.
+          If you didn't sign up for Outfitted, you can ignore this email.
         </p>
       </div>
     `,
   }),
 
   accountDeleted: (email: string) => ({
-    subject: 'Din Outfitted-konto er slettet',
+    subject: 'Your Outfitted account has been deleted',
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #FAF9F7; padding: 40px; border-radius: 12px;">
-        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Kontoen din er slettet</h1>
+        <h1 style="color: #4A4A4A; margin-bottom: 24px;">Your account has been deleted</h1>
 
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6;">
-          Kontoen tilknyttet <strong>${email}</strong> har blitt slettet fordi e-postadressen
-          ikke ble bekreftet innen 24 timer.
+          The account associated with <strong>${email}</strong> has been deleted because the email address
+          was not verified within 24 hours.
         </p>
 
         <p style="color: #6B6B6B; font-size: 16px; line-height: 1.6; margin-top: 20px;">
-          Du er velkommen til å registrere deg på nytt når som helst!
+          You're welcome to sign up again anytime!
         </p>
 
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/register"
            style="display: inline-block; background: #D4A5A5; color: white; padding: 14px 28px;
                   border-radius: 8px; text-decoration: none; margin-top: 20px; font-weight: 500;">
-          Registrer deg på nytt
+          Sign up again
         </a>
       </div>
     `,

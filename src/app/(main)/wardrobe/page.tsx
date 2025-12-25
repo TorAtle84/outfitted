@@ -10,5 +10,5 @@ export default async function WardrobePage() {
     redirect('/login')
   }
 
-  return <WardrobeClient user={user} />
+  return <WardrobeClient />
 }

@@ -125,21 +125,21 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
       if (!res.ok) {
         setPromoError(data.error)
       } else {
-        setPromoSuccess(`Promo-tilgang gitt til ${promoEmail}`)
+        setPromoSuccess(`Promo access granted to ${promoEmail}`)
         setPromoEmail('')
         setPromoReason('')
         setPromoExpires('')
         loadPromoUsers()
       }
     } catch {
-      setPromoError('En feil oppstod')
+      setPromoError('An error occurred')
     } finally {
       setPromoLoading(false)
     }
   }
 
   async function removePromoUser(promoId: string) {
-    if (!confirm('Er du sikker på at du vil fjerne promo-tilgangen?')) return
+    if (!confirm('Are you sure you want to remove promo access?')) return
 
     try {
       const res = await fetch(`/api/admin/promo?id=${promoId}`, {
@@ -157,7 +157,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
-        <p className="text-taupe">Laster...</p>
+        <p className="text-taupe">Loading...</p>
       </div>
     )
   }
@@ -168,7 +168,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-charcoal">Admin Dashboard</h1>
-          <p className="text-taupe">Logget inn som {adminEmail}</p>
+          <p className="text-taupe">Logged in as {adminEmail}</p>
         </div>
 
         {/* Tabs */}
@@ -177,19 +177,19 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
             variant={activeTab === 'overview' ? 'primary' : 'secondary'}
             onClick={() => setActiveTab('overview')}
           >
-            Oversikt
+            Overview
           </Button>
           <Button
             variant={activeTab === 'users' ? 'primary' : 'secondary'}
             onClick={() => setActiveTab('users')}
           >
-            Brukere
+            Users
           </Button>
           <Button
             variant={activeTab === 'promo' ? 'primary' : 'secondary'}
             onClick={() => setActiveTab('promo')}
           >
-            Promo-tilgang
+            Promo Access
           </Button>
         </div>
 
@@ -197,29 +197,29 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
         {activeTab === 'overview' && stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
-              <h3 className="text-lg font-semibold text-charcoal mb-2">Totalt brukere</h3>
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Total Users</h3>
               <p className="text-4xl font-bold text-rose">{stats.totalUsers}</p>
-              <p className="text-sm text-taupe mt-2">+{stats.recentSignups} siste 7 dager</p>
+              <p className="text-sm text-taupe mt-2">+{stats.recentSignups} last 7 days</p>
             </Card>
             <Card>
-              <h3 className="text-lg font-semibold text-charcoal mb-2">Promo-brukere</h3>
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Promo Users</h3>
               <p className="text-4xl font-bold text-sage">{stats.promoUsers}</p>
-              <p className="text-sm text-taupe mt-2">Gratis premium-tilgang</p>
+              <p className="text-sm text-taupe mt-2">Free premium access</p>
             </Card>
             <Card>
-              <h3 className="text-lg font-semibold text-charcoal mb-2">Premium-brukere</h3>
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Premium Users</h3>
               <p className="text-4xl font-bold text-dusty-rose">{stats.premiumUsers}</p>
-              <p className="text-sm text-taupe mt-2">Betalende kunder</p>
+              <p className="text-sm text-taupe mt-2">Paying customers</p>
             </Card>
             <Card>
-              <h3 className="text-lg font-semibold text-charcoal mb-2">Totalt plagg</h3>
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Total Clothes</h3>
               <p className="text-4xl font-bold text-charcoal">{stats.totalClothes}</p>
-              <p className="text-sm text-taupe mt-2">I alle garderober</p>
+              <p className="text-sm text-taupe mt-2">Across all wardrobes</p>
             </Card>
             <Card>
-              <h3 className="text-lg font-semibold text-charcoal mb-2">Totalt antrekk</h3>
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Total Outfits</h3>
               <p className="text-4xl font-bold text-charcoal">{stats.totalOutfits}</p>
-              <p className="text-sm text-taupe mt-2">Lagrede antrekk</p>
+              <p className="text-sm text-taupe mt-2">Saved outfits</p>
             </Card>
           </div>
         )}
@@ -229,7 +229,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
           <div>
             <div className="mb-6">
               <Input
-                placeholder="Søk etter e-post eller navn..."
+                placeholder="Search by email or name..."
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
               />
@@ -238,11 +238,11 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
               <table className="w-full">
                 <thead className="bg-beige">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Bruker</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">User</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Plagg</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Antrekk</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Registrert</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Clothes</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Outfits</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-charcoal">Registered</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-beige">
@@ -250,7 +250,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
                     <tr key={user.id} className="hover:bg-cream/50">
                       <td className="px-4 py-3">
                         <div>
-                          <p className="font-medium text-charcoal">{user.name || 'Ingen navn'}</p>
+                          <p className="font-medium text-charcoal">{user.name || 'No name'}</p>
                           <p className="text-sm text-taupe">{user.email}</p>
                         </div>
                       </td>
@@ -272,14 +272,14 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
                         )}
                         {!user.promoAccess && user.subscription?.tier !== 'PREMIUM' && user.role !== 'ADMIN' && (
                           <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                            Gratis
+                            Free
                           </span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-charcoal">{user._count.clothes}</td>
                       <td className="px-4 py-3 text-charcoal">{user._count.outfits}</td>
                       <td className="px-4 py-3 text-taupe text-sm">
-                        {new Date(user.createdAt).toLocaleDateString('nb-NO')}
+                        {new Date(user.createdAt).toLocaleDateString('en-US')}
                       </td>
                     </tr>
                   ))}
@@ -294,24 +294,24 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Add Promo Form */}
             <Card>
-              <h2 className="text-xl font-semibold text-charcoal mb-6">Legg til promo-bruker</h2>
+              <h2 className="text-xl font-semibold text-charcoal mb-6">Add Promo User</h2>
               <form onSubmit={addPromoUser} className="space-y-4">
                 <Input
-                  label="E-postadresse"
+                  label="Email address"
                   type="email"
                   value={promoEmail}
                   onChange={(e) => setPromoEmail(e.target.value)}
-                  placeholder="bruker@eksempel.no"
+                  placeholder="user@example.com"
                   required
                 />
                 <Input
-                  label="Grunn (valgfritt)"
+                  label="Reason (optional)"
                   value={promoReason}
                   onChange={(e) => setPromoReason(e.target.value)}
-                  placeholder="F.eks. Influencer, Beta-tester, Venn"
+                  placeholder="e.g. Influencer, Beta tester, Friend"
                 />
                 <Input
-                  label="Utløper (valgfritt)"
+                  label="Expires (optional)"
                   type="date"
                   value={promoExpires}
                   onChange={(e) => setPromoExpires(e.target.value)}
@@ -329,7 +329,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
                 )}
 
                 <Button type="submit" className="w-full" isLoading={promoLoading}>
-                  Legg til promo-tilgang
+                  Add promo access
                 </Button>
               </form>
             </Card>
@@ -337,11 +337,11 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
             {/* Promo Users List */}
             <Card>
               <h2 className="text-xl font-semibold text-charcoal mb-6">
-                Aktive promo-brukere ({promoUsers.length})
+                Active Promo Users ({promoUsers.length})
               </h2>
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {promoUsers.length === 0 ? (
-                  <p className="text-taupe text-center py-4">Ingen promo-brukere ennå</p>
+                  <p className="text-taupe text-center py-4">No promo users yet</p>
                 ) : (
                   promoUsers.map((promo) => (
                     <div
@@ -358,7 +358,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
                         )}
                         {promo.expiresAt && (
                           <p className="text-xs text-amber-600 mt-1">
-                            Utløper: {new Date(promo.expiresAt).toLocaleDateString('nb-NO')}
+                            Expires: {new Date(promo.expiresAt).toLocaleDateString('en-US')}
                           </p>
                         )}
                       </div>
@@ -367,7 +367,7 @@ export default function AdminDashboard({ adminEmail }: { adminEmail: string }) {
                         size="sm"
                         onClick={() => removePromoUser(promo.id)}
                       >
-                        Fjern
+                        Remove
                       </Button>
                     </div>
                   ))

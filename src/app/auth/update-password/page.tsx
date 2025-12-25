@@ -20,13 +20,13 @@ export default function UpdatePasswordPage() {
     setError('')
 
     if (password !== confirmPassword) {
-      setError('Passordene stemmer ikke overens')
+      setError('Passwords do not match')
       setIsLoading(false)
       return
     }
 
     if (password.length < 8) {
-      setError('Passordet må være minst 8 tegn')
+      setError('Password must be at least 8 characters')
       setIsLoading(false)
       return
     }
@@ -45,7 +45,7 @@ export default function UpdatePasswordPage() {
         }, 2000)
       }
     } catch {
-      setError('En feil oppstod. Prøv igjen.')
+      setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -58,10 +58,10 @@ export default function UpdatePasswordPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="text-4xl mb-4">✓</div>
             <h1 className="text-2xl font-semibold text-charcoal-soft mb-2">
-              Passord oppdatert!
+              Password updated!
             </h1>
             <p className="text-warm-taupe">
-              Du blir nå sendt til innloggingssiden...
+              Redirecting you to the login page...
             </p>
           </div>
         </div>
@@ -74,10 +74,10 @@ export default function UpdatePasswordPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <h1 className="text-2xl font-semibold text-charcoal-soft text-center mb-2">
-            Velg nytt passord
+            Choose new password
           </h1>
           <p className="text-warm-taupe text-center mb-8">
-            Skriv inn ditt nye passord under.
+            Enter your new password below.
           </p>
 
           {error && (
@@ -88,25 +88,25 @@ export default function UpdatePasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="Nytt passord"
+              label="New password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minst 8 tegn"
+              placeholder="At least 8 characters"
               required
             />
 
             <Input
-              label="Bekreft passord"
+              label="Confirm password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Skriv passordet på nytt"
+              placeholder="Re-enter your password"
               required
             />
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Oppdaterer...' : 'Oppdater passord'}
+              {isLoading ? 'Updating...' : 'Update password'}
             </Button>
           </form>
         </div>

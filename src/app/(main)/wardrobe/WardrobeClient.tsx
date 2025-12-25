@@ -1,63 +1,61 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import type { User } from '@supabase/supabase-js'
 import { Button, Card } from '@/components/ui'
 import AddClothingModal, { type ClothingFormData } from '@/components/wardrobe/AddClothingModal'
 import ClothingGrid from '@/components/wardrobe/ClothingGrid'
-import type { ClothingStyle, Season, Occasion, PatternType } from '@/types'
-
-interface WardrobeClientProps {
-  user: User
-}
+import type { ClothingStyle, Season } from '@/types'
 
 type ClothingFilter = 'all' | 'top' | 'bottom' | 'dress' | 'outerwear' | 'shoes' | 'accessory'
 
 interface ClothingItem extends ClothingFormData {
   id: string
+  secondaryColors?: string[]
 }
 
-// Mock data for demonstration
-const MOCK_CLOTHES: ClothingItem[] = [
-  {
-    id: '1',
-    imageUrl: '',
-    type: 'TOP',
-    styles: ['casual'] as ClothingStyle[],
-    seasons: ['spring', 'summer'] as Season[],
-    occasions: ['weekend'] as Occasion[],
-    primaryColor: '#4169E1',
-    pattern: 'solid' as PatternType,
-  },
-  {
-    id: '2',
-    imageUrl: '',
-    type: 'BOTTOM',
-    styles: ['casual'] as ClothingStyle[],
-    seasons: ['spring', 'summer', 'fall'] as Season[],
-    occasions: ['work', 'weekend'] as Occasion[],
-    primaryColor: '#4A4A4A',
-    pattern: 'solid' as PatternType,
-  },
-  {
-    id: '3',
-    imageUrl: '',
-    type: 'SHOES',
-    styles: ['casual'] as ClothingStyle[],
-    seasons: ['spring', 'summer', 'fall'] as Season[],
-    occasions: ['weekend'] as Occasion[],
-    primaryColor: '#FFFFFF',
-    pattern: 'solid' as PatternType,
-  },
-]
-
-export default function WardrobeClient({ user }: WardrobeClientProps) {
+export default function WardrobeClient() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [activeFilter, setActiveFilter] = useState<ClothingFilter>('all')
   const [activeStyleFilter, setActiveStyleFilter] = useState<ClothingStyle | null>(null)
   const [activeSeasonFilter, setActiveSeasonFilter] = useState<Season | null>(null)
-  const [clothes, setClothes] = useState(MOCK_CLOTHES)
+  const [clothes, setClothes] = useState<ClothingItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadClothes = async () => {
+      try {
+        setError(null)
+        const response = await fetch('/api/clothes')
+        const body = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          throw new Error(body?.error || 'Failed to load wardrobe items')
+        }
+
+        if (isMounted) {
+          setClothes(Array.isArray(body?.items) ? body.items : [])
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Failed to load wardrobe items')
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadClothes()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const filters: { value: ClothingFilter; label: string }[] = [
     { value: 'all', label: 'All' },
@@ -85,9 +83,38 @@ export default function WardrobeClient({ user }: WardrobeClientProps) {
     return true
   })
 
-  const handleAddClothing = (newItem: ClothingFormData) => {
-    setClothes((prev) => [...prev, { ...newItem, id: Date.now().toString() }])
+  const handleAddClothing = async (newItem: ClothingFormData) => {
+    setError(null)
+    const response = await fetch('/api/clothes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newItem),
+    })
+
+    const body = await response.json().catch(() => null)
+    if (!response.ok) {
+      throw new Error(body?.error || 'Failed to add wardrobe item')
+    }
+
+    if (!body?.item) {
+      throw new Error('Missing wardrobe item in response')
+    }
+
+    setClothes((prev) => [body.item, ...prev])
     setIsAddModalOpen(false)
+  }
+
+  const handleDeleteClothing = async (id: string) => {
+    setError(null)
+    const response = await fetch(`/api/clothes/${id}`, { method: 'DELETE' })
+    const body = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      setError(body?.error || 'Failed to delete wardrobe item')
+      return
+    }
+
+    setClothes((prev) => prev.filter((item) => item.id !== id))
   }
 
   return (
@@ -196,9 +223,19 @@ export default function WardrobeClient({ user }: WardrobeClientProps) {
           </div>
         </Card>
 
+        {error && (
+          <Card className="mb-6 border border-rose/30 bg-blush/40">
+            <p className="text-sm text-charcoal">{error}</p>
+          </Card>
+        )}
+
         {/* Clothing Grid */}
-        {filteredClothes.length > 0 ? (
-          <ClothingGrid items={filteredClothes} />
+        {isLoading ? (
+          <Card className="text-center py-12">
+            <p className="text-taupe">Loading wardrobe...</p>
+          </Card>
+        ) : filteredClothes.length > 0 ? (
+          <ClothingGrid items={filteredClothes} onItemDelete={handleDeleteClothing} />
         ) : (
           <Card className="text-center py-12">
             <div className="w-16 h-16 mx-auto mb-4 bg-blush rounded-full flex items-center justify-center">

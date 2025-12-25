@@ -14,21 +14,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Outfitted - Din garderobe, perfeksjonert",
+    default: "Outfitted - Your wardrobe, perfected",
     template: "%s | Outfitted",
   },
-  description: "AI-drevet antrekksforslag og garderobeorganisering. Planlegg antrekk, få stilråd basert på vær og anledning.",
-  keywords: ["garderobe", "antrekk", "mote", "stil", "klær", "outfit", "AI"],
+  description: "AI-powered outfit suggestions and wardrobe organization. Plan outfits, get style advice based on weather and occasion.",
+  keywords: ["wardrobe", "outfit", "fashion", "style", "clothes", "AI"],
   authors: [{ name: "Outfitted" }],
   icons: {
     icon: "/icon.svg",
     apple: "/icon.svg",
   },
   openGraph: {
-    title: "Outfitted - Din garderobe, perfeksjonert",
-    description: "AI-drevet antrekksforslag og garderobeorganisering",
+    title: "Outfitted - Your wardrobe, perfected",
+    description: "AI-powered outfit suggestions and wardrobe organization",
     type: "website",
-    locale: "nb_NO",
+    locale: "en_US",
   },
 };
 
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nb">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

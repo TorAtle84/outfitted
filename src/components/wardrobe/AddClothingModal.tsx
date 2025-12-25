@@ -7,7 +7,7 @@ import type { ClothingStyle, Season, Occasion, PatternType } from '@/types'
 interface AddClothingModalProps {
   isOpen: boolean
   onClose: () => void
-  onAdd: (item: ClothingFormData) => void
+  onAdd: (item: ClothingFormData) => Promise<void> | void
 }
 
 export interface ClothingFormData {
@@ -53,6 +53,8 @@ export default function AddClothingModal({
     brand: '',
   })
   const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   if (!isOpen) return null
 
@@ -107,7 +109,7 @@ export default function AddClothingModal({
     })
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const data: ClothingFormData = {
       ...formData,
       styles: formData.styles.length > 0 ? formData.styles : ['casual'],
@@ -115,8 +117,16 @@ export default function AddClothingModal({
       occasions: formData.occasions.length > 0 ? formData.occasions : ['weekend'],
     }
 
-    onAdd(data)
-    resetForm()
+    try {
+      setIsSubmitting(true)
+      setSubmitError(null)
+      await onAdd(data)
+      resetForm()
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to add item')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const resetForm = () => {
@@ -132,6 +142,8 @@ export default function AddClothingModal({
       brand: '',
     })
     setPreviewImage(null)
+    setSubmitError(null)
+    setIsSubmitting(false)
   }
 
   const handleClose = () => {
@@ -154,6 +166,11 @@ export default function AddClothingModal({
             </svg>
           </button>
         </div>
+        {submitError && (
+          <div className="mb-4 rounded-lg border border-rose/30 bg-blush/40 px-4 py-2 text-sm text-charcoal">
+            {submitError}
+          </div>
+        )}
 
         {/* Step Indicator */}
         <div className="flex gap-2 mb-6">
@@ -403,8 +420,8 @@ export default function AddClothingModal({
               <Button variant="outline" className="flex-1" onClick={() => setStep(2)}>
                 Back
               </Button>
-              <Button className="flex-1" onClick={handleSubmit}>
-                Add to Wardrobe
+              <Button className="flex-1" onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Add to Wardrobe'}
               </Button>
             </div>
           </div>

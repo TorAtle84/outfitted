@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     const { email, reason, expiresAt } = await request.json()
 
     if (!email) {
-      return NextResponse.json({ error: 'E-post er påkrevd' }, { status: 400 })
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
     // Find or create user
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     })
 
     if (existingPromo) {
-      return NextResponse.json({ error: 'Bruker har allerede promo-tilgang' }, { status: 400 })
+      return NextResponse.json({ error: 'User already has promo access' }, { status: 400 })
     }
 
     // Grant promo access
@@ -114,7 +114,7 @@ export async function DELETE(request: Request) {
     const promoId = searchParams.get('id')
 
     if (!promoId) {
-      return NextResponse.json({ error: 'Promo ID er påkrevd' }, { status: 400 })
+      return NextResponse.json({ error: 'Promo ID is required' }, { status: 400 })
     }
 
     await prisma.promoAccess.delete({

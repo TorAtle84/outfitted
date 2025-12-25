@@ -7,17 +7,17 @@ export default function VerifiedPage() {
       <Card variant="elevated" className="w-full max-w-md text-center">
         <div className="text-6xl mb-6">✓</div>
         <h1 className="text-2xl font-bold text-charcoal mb-4">
-          E-posten din er bekreftet!
+          Email verified!
         </h1>
         <p className="text-taupe mb-8">
-          Takk for at du bekreftet e-postadressen din. Kontoen din er nå aktivert og klar til bruk.
+          Thank you for verifying your email address. Your account is now activated and ready to use.
         </p>
         <p className="text-taupe mb-8">
-          Du kan nå logge inn og begynne å bruke Outfitted for å organisere garderoben din.
+          You can now sign in and start using Outfitted to organize your wardrobe.
         </p>
         <Link href="/login">
           <Button className="w-full" size="lg">
-            Gå til innlogging
+            Go to login
           </Button>
         </Link>
       </Card>
