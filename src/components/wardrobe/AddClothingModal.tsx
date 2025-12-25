@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Button, Card, Input } from '@/components/ui'
+import { AvatarStylePicker } from '@/components/avatar'
 import type { ClothingStyle, Season, Occasion, PatternType } from '@/types'
 
 interface AddClothingModalProps {
@@ -19,6 +20,7 @@ export interface ClothingFormData {
   primaryColor: string
   pattern: PatternType
   brand?: string
+  avatarStyle?: string
 }
 
 const CLOTHING_TYPES = [
@@ -174,7 +176,7 @@ export default function AddClothingModal({
 
         {/* Step Indicator */}
         <div className="flex gap-2 mb-6">
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3, 4].map((s) => (
             <div
               key={s}
               className={`h-1 flex-1 rounded-full ${
@@ -418,6 +420,28 @@ export default function AddClothingModal({
 
             <div className="flex gap-4">
               <Button variant="outline" className="flex-1" onClick={() => setStep(2)}>
+                Back
+              </Button>
+              <Button className="flex-1" onClick={() => setStep(4)}>
+                Continue
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Avatar Style */}
+        {step === 4 && (
+          <div className="space-y-6">
+            <AvatarStylePicker
+              clothingType={formData.type}
+              primaryColor={formData.primaryColor}
+              pattern={formData.pattern}
+              onSelect={(style) => setFormData((prev) => ({ ...prev, avatarStyle: style }))}
+              selectedStyle={formData.avatarStyle}
+            />
+
+            <div className="flex gap-4">
+              <Button variant="outline" className="flex-1" onClick={() => setStep(3)}>
                 Back
               </Button>
               <Button className="flex-1" onClick={handleSubmit} disabled={isSubmitting}>

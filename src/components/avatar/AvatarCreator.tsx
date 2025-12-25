@@ -3,7 +3,18 @@
 import { useState } from 'react'
 import { Button, Card } from '@/components/ui'
 import AvatarDisplay from './AvatarDisplay'
-import type { AccessoryType, AvatarCustomization, BodyType, FaceShape, HairStyle } from '@/types'
+import type {
+  AccessoryType,
+  AvatarCustomization,
+  BodyType,
+  EyebrowStyle,
+  EyeShape,
+  FaceShape,
+  FacialHairType,
+  HairStyle,
+  MouthExpression,
+  NoseType,
+} from '@/types'
 
 interface AvatarCreatorProps {
   initialData?: Partial<AvatarCustomization>
@@ -45,6 +56,50 @@ const FACE_SHAPES: { value: FaceShape; label: string }[] = [
   { value: 'heart', label: 'Heart' },
   { value: 'oblong', label: 'Oblong' },
   { value: 'diamond', label: 'Diamond' },
+]
+
+const EYE_SHAPES: { value: EyeShape; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'round', label: 'Round' },
+  { value: 'almond', label: 'Almond' },
+  { value: 'upturned', label: 'Upturned' },
+  { value: 'downturned', label: 'Downturned' },
+  { value: 'hooded', label: 'Hooded' },
+]
+
+const EYEBROW_STYLES: { value: EyebrowStyle; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'thick', label: 'Thick' },
+  { value: 'thin', label: 'Thin' },
+  { value: 'arched', label: 'Arched' },
+  { value: 'straight', label: 'Straight' },
+  { value: 'rounded', label: 'Rounded' },
+]
+
+const NOSE_TYPES: { value: NoseType; label: string }[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'small', label: 'Small' },
+  { value: 'wide', label: 'Wide' },
+  { value: 'pointed', label: 'Pointed' },
+  { value: 'button', label: 'Button' },
+  { value: 'roman', label: 'Roman' },
+]
+
+const MOUTH_EXPRESSIONS: { value: MouthExpression; label: string }[] = [
+  { value: 'smile', label: 'Smile' },
+  { value: 'neutral', label: 'Neutral' },
+  { value: 'serious', label: 'Serious' },
+  { value: 'laugh', label: 'Laugh' },
+  { value: 'slight-smile', label: 'Slight Smile' },
+]
+
+const FACIAL_HAIR_TYPES: { value: FacialHairType | 'none'; label: string }[] = [
+  { value: 'none', label: 'None' },
+  { value: 'stubble', label: 'Stubble' },
+  { value: 'short-beard', label: 'Short Beard' },
+  { value: 'full-beard', label: 'Full Beard' },
+  { value: 'goatee', label: 'Goatee' },
+  { value: 'mustache', label: 'Mustache' },
 ]
 
 const SKIN_TONES = [
@@ -141,9 +196,16 @@ export default function AvatarCreator({
     hairStyle: initialData?.hairStyle || 'long-wavy',
     hairColor: initialData?.hairColor || '#2C1810',
     hairHighlights: initialData?.hairHighlights,
+    eyeShape: initialData?.eyeShape || 'default',
     eyeColor: initialData?.eyeColor || '#4A3728',
+    eyebrowStyle: initialData?.eyebrowStyle || 'default',
+    noseType: initialData?.noseType || 'default',
+    mouthExpression: initialData?.mouthExpression || 'smile',
+    facialHair: initialData?.facialHair,
     faceShape: initialData?.faceShape || 'oval',
     accessories: initialData?.accessories || [],
+    hasFreckles: initialData?.hasFreckles || false,
+    hasBeautyMark: initialData?.hasBeautyMark || false,
   })
 
   const updateAvatar = (updates: Partial<AvatarCustomization>) => {
@@ -182,13 +244,19 @@ export default function AvatarCreator({
           hairColor={avatar.hairColor}
           hairHighlights={avatar.hairHighlights}
           hairStyle={avatar.hairStyle}
+          eyeShape={avatar.eyeShape}
           eyeColor={avatar.eyeColor}
+          eyebrowStyle={avatar.eyebrowStyle}
+          noseType={avatar.noseType}
+          mouthExpression={avatar.mouthExpression}
+          facialHair={avatar.facialHair}
           faceShape={avatar.faceShape}
           bodyType={avatar.bodyType}
           height={avatar.height}
           accessories={avatar.accessories}
+          hasFreckles={avatar.hasFreckles}
+          hasBeautyMark={avatar.hasBeautyMark}
           size="lg"
-          showRotationControls
         />
       </Card>
 
@@ -288,7 +356,7 @@ export default function AvatarCreator({
           )}
 
           {activeTab === 'face' && (
-            <>
+            <div className="space-y-5 max-h-[60vh] overflow-y-auto pr-2">
               <div>
                 <label className="block text-sm font-medium text-charcoal mb-3">
                   Face Shape
@@ -300,6 +368,27 @@ export default function AvatarCreator({
                       onClick={() => updateAvatar({ faceShape: value })}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                         avatar.faceShape === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Eye Shape
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {EYE_SHAPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ eyeShape: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.eyeShape === value
                           ? 'bg-rose text-white'
                           : 'bg-beige text-charcoal hover:bg-blush'
                       }`}
@@ -340,7 +429,117 @@ export default function AvatarCreator({
                   ))}
                 </div>
               </div>
-            </>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Eyebrows
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {EYEBROW_STYLES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ eyebrowStyle: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.eyebrowStyle === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Nose
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {NOSE_TYPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ noseType: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.noseType === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Expression
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {MOUTH_EXPRESSIONS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ mouthExpression: value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        avatar.mouthExpression === value
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Facial Hair
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {FACIAL_HAIR_TYPES.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => updateAvatar({ facialHair: value === 'none' ? undefined : value })}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        (avatar.facialHair === value) || (value === 'none' && !avatar.facialHair)
+                          ? 'bg-rose text-white'
+                          : 'bg-beige text-charcoal hover:bg-blush'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-charcoal mb-3">
+                  Extras
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={avatar.hasFreckles || false}
+                      onChange={(e) => updateAvatar({ hasFreckles: e.target.checked })}
+                      className="w-4 h-4 rounded border-beige text-rose focus:ring-rose"
+                    />
+                    <span className="text-sm text-charcoal">Freckles</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={avatar.hasBeautyMark || false}
+                      onChange={(e) => updateAvatar({ hasBeautyMark: e.target.checked })}
+                      className="w-4 h-4 rounded border-beige text-rose focus:ring-rose"
+                    />
+                    <span className="text-sm text-charcoal">Beauty Mark</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           )}
 
           {activeTab === 'hair' && (

@@ -14,10 +14,57 @@ export interface AvatarCustomization {
   hairStyle: HairStyle
   hairColor: string // hex color
   hairHighlights?: string // hex color
+  eyeShape: EyeShape
   eyeColor: string // hex color
+  eyebrowStyle: EyebrowStyle
+  noseType: NoseType
+  mouthExpression: MouthExpression
+  facialHair?: FacialHairType
   faceShape: FaceShape
   accessories: AccessoryType[]
+  // Additional details
+  hasFreckles?: boolean
+  hasBeautyMark?: boolean
 }
+
+export type EyeShape =
+  | 'default'
+  | 'round'
+  | 'almond'
+  | 'upturned'
+  | 'downturned'
+  | 'hooded'
+
+export type EyebrowStyle =
+  | 'default'
+  | 'thick'
+  | 'thin'
+  | 'arched'
+  | 'straight'
+  | 'rounded'
+
+export type NoseType =
+  | 'default'
+  | 'small'
+  | 'wide'
+  | 'pointed'
+  | 'button'
+  | 'roman'
+
+export type MouthExpression =
+  | 'smile'
+  | 'neutral'
+  | 'serious'
+  | 'laugh'
+  | 'slight-smile'
+
+export type FacialHairType =
+  | 'none'
+  | 'stubble'
+  | 'short-beard'
+  | 'full-beard'
+  | 'goatee'
+  | 'mustache'
 
 export type BodyType =
   | 'slim'
@@ -70,6 +117,62 @@ export type AccessoryType =
   | 'hat-beanie'
   | 'hat-cap'
   | 'hat-fedora'
+
+// Avatar clothing styles (for displaying clothes on avatar)
+export type AvatarTopStyle =
+  | 'tshirt'
+  | 'blouse'
+  | 'sweater'
+  | 'hoodie'
+  | 'tank-top'
+  | 'polo'
+  | 'button-shirt'
+  | 'crop-top'
+  | 'cardigan'
+  | 'blazer'
+  | 'jacket'
+  | 'coat'
+
+export type AvatarBottomStyle =
+  | 'jeans'
+  | 'trousers'
+  | 'shorts'
+  | 'skirt-short'
+  | 'skirt-midi'
+  | 'skirt-long'
+  | 'leggings'
+  | 'joggers'
+  | 'dress-pants'
+
+export type AvatarDressStyle =
+  | 'casual-dress'
+  | 'formal-dress'
+  | 'maxi-dress'
+  | 'mini-dress'
+  | 'sundress'
+
+export type AvatarShoeStyle =
+  | 'sneakers'
+  | 'boots'
+  | 'heels'
+  | 'flats'
+  | 'sandals'
+  | 'loafers'
+
+export interface AvatarOutfit {
+  top?: { style: AvatarTopStyle; color: string; pattern?: PatternType }
+  bottom?: { style: AvatarBottomStyle; color: string; pattern?: PatternType }
+  dress?: { style: AvatarDressStyle; color: string; pattern?: PatternType }
+  shoes?: { style: AvatarShoeStyle; color: string }
+  outerwear?: { style: AvatarTopStyle; color: string }
+}
+
+// Suggested avatar style for a real clothing item
+export interface AvatarClothingSuggestion {
+  style: AvatarTopStyle | AvatarBottomStyle | AvatarDressStyle | AvatarShoeStyle
+  confidence: number // 0-100
+  preview?: string // SVG preview
+}
 
 // Clothing categorization types
 export type ClothingStyle =

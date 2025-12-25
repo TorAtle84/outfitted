@@ -59,7 +59,6 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                 bodyType={avatar?.bodyType}
                 height={avatar?.height}
                 accessories={avatar?.accessories}
-                showRotationControls={false}
               />
             </div>
             <h2 className="text-xl font-bold text-charcoal">
