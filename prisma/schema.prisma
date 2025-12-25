@@ -1,0 +1,194 @@
+// Outfitted - Prisma Schema
+// Database: PostgreSQL (Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String            @id @default(cuid())
+  email        String            @unique
+  name         String?
+  avatar       Avatar?
+  clothes      Clothing[]
+  outfits      Outfit[]
+  trips        Trip[]
+  posts        Post[]
+  follows      Follow[]          @relation("follower")
+  followers    Follow[]          @relation("following")
+  preferences  UserPreferences?
+  subscription Subscription?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Avatar {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bodyType       String
+  height         Int
+  skinTone       String   // Hex color
+  hairStyle      String
+  hairColor      String   // Hex color
+  hairHighlights String?  // Hex color
+  eyeColor       String   // Hex color
+  faceShape      String
+  accessories    Json     // Array of accessory IDs
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Clothing {
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageUrl        String
+  type            ClothingType
+  styles          String[]     // ["casual", "formal"]
+  seasons         String[]     // ["winter", "spring"]
+  occasions       String[]     // ["work", "weekend"]
+  primaryColor    String       // Hex color (auto-detected)
+  secondaryColors String[]     // Additional colors
+  pattern         String?      // "solid", "stripes", "plaid", etc.
+  brand           String?
+  isOuterwear     Boolean      @default(false)
+  wearCount       Int          @default(0)
+  lastWorn        DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  outfitItems OutfitItem[]
+}
+
+enum ClothingType {
+  TOP
+  BOTTOM
+  DRESS
+  OUTERWEAR
+  SHOES
+  ACCESSORY
+}
+
+model Outfit {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       OutfitItem[]
+  occasion    String?
+  plannedDate DateTime?
+  worn        Boolean      @default(false)
+  rating      Int?         // 1-5 self-rating
+  tripId      String?
+  trip        Trip?        @relation(fields: [tripId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model OutfitItem {
+  id         String   @id @default(cuid())
+  outfitId   String
+  outfit     Outfit   @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+  clothingId String
+  clothing   Clothing @relation(fields: [clothingId], references: [id], onDelete: Cascade)
+  layer      Int      // For ordering (base layer = 0, outer = higher)
+}
+
+model Trip {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  outfits     Outfit[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Post {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfitData    Json       // Snapshot of outfit at time of posting
+  caption       String?
+  visibility    Visibility
+  allowComments Boolean    @default(true)
+  anonymous     Boolean    @default(false)
+  ratings       Rating[]
+  comments      Comment[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+enum Visibility {
+  PUBLIC
+  FRIENDS
+  PRIVATE
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  raterId   String
+  stars     Int      // 1-5
+  createdAt DateTime @default(now())
+
+  @@unique([postId, raterId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  follower    User     @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model UserPreferences {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationTime       String   @default("05:00")
+  enableNotifications    Boolean  @default(true)
+  enableSustainability   Boolean  @default(true)
+  enableSeasonalRotation Boolean  @default(true)
+  colorSeason            String?  // "spring", "summer", "autumn", "winter"
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Subscription {
+  id          String           @id @default(cuid())
+  userId      String           @unique
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier        SubscriptionTier
+  startDate   DateTime
+  endDate     DateTime?
+  trialEndsAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum SubscriptionTier {
+  FREE_TRIAL
+  FREE
+  PREMIUM
+}
