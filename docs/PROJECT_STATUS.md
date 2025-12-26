@@ -1,8 +1,8 @@
 # Outfitted - Project Status
 
-**Last Updated:** 2025-12-25 20:18
+**Last Updated:** 2025-12-26 13:04
 **Current Phase:** Phase 1 - MVP
-**Overall Progress:** 60%
+**Overall Progress:** 63%
 
 ---
 
@@ -42,8 +42,8 @@
 - [ ] Image upload to Supabase Storage
 - [ ] Replace mock weather data on Home
 
-### Phase 2: Core Features (0% complete)
-- [ ] Advanced avatar customization (expand options further; started)
+### Phase 2: Core Features (7% complete)
+- [ ] Advanced avatar customization (expand options further; in progress)
 - [ ] Color intelligence system (user color season)
 - [ ] Weather API integration
 - [ ] Shuffle mechanics with locking
@@ -81,6 +81,7 @@
 
 | Feature | Status | Blockers | Notes |
 |---------|--------|----------|-------|
+| Avatar style polish (custom renderer) | 30% | Needs visual refs for final art direction | Basic pack styles implemented + refined |
 | Image upload + moderation + storage | 20% | Needs Supabase Storage bucket + upload flow | Moderation endpoint exists |
 | Weather API integration | 0% | Needs API key/provider choice | Home shows mock weather |
 | UI polish (encoding + design tokens) | 10% | Time/cleanup | Some pages have garbled characters + inconsistent Tailwind color tokens |

@@ -84,15 +84,29 @@ export default function AvatarDisplay({
   const clampedHeight = clamp(avatarHeight, 140, 200)
   const bodyScaleY = 0.9 + ((clampedHeight - 140) / 60) * 0.2
 
-  const topColor = outfit?.top?.color || outfit?.dress?.color || '#E8DFD4'
-  const bottomColor = outfit?.bottom?.color || '#4A4A4A'
+  const outfitTop = outfit?.top
+  const outfitBottom = outfit?.bottom
+  const outfitDress = outfit?.dress
+  const outfitOuterwear = outfit?.outerwear
+
+  const topColor = outfitTop?.color || outfitDress?.color || '#E8DFD4'
+  const bottomColor = outfitBottom?.color || '#4A4A4A'
   const shoesColor = outfit?.shoes?.color || '#2C1810'
+  const topStyle = outfitTop?.style
+  const bottomStyle = outfitBottom?.style
+  const shoesStyle = outfit?.shoes?.style
+  const dressStyle = outfitDress?.style
+  const dressColor = outfitDress?.color
+  const outerwearStyle = outfitOuterwear?.style
+  const outerwearColor = outfitOuterwear?.color
 
   const body = BODY_SPECS[bodyType] ?? BODY_SPECS.average
   const torsoPath = getTorsoPath(body)
+  const outerwearPath = outerwearStyle ? getOuterwearPath(body, outerwearStyle) : null
 
   const torsoStroke = shadeHex(topColor, -0.2)
   const hairStroke = shadeHex(hairColor, -0.35)
+  const outerwearStroke = outerwearColor ? shadeHex(outerwearColor, -0.25) : ''
 
   return (
     <div className={`relative ${className}`}>
@@ -122,16 +136,22 @@ export default function AvatarDisplay({
               <BodySVG
                 skinTone={skinTone}
                 topColor={topColor}
-                topStyle={outfit?.top?.style || outfit?.dress?.style}
+                topStyle={topStyle}
+                dressStyle={dressStyle}
+                dressColor={dressColor}
                 torsoPath={torsoPath}
                 torsoStroke={torsoStroke}
                 shoulder={body.shoulder}
                 armWidth={body.armWidth}
                 legWidth={body.legWidth}
                 bottomColor={bottomColor}
-                bottomStyle={outfit?.bottom?.style}
+                bottomStyle={bottomStyle}
                 shoesColor={shoesColor}
-                shoesStyle={outfit?.shoes?.style}
+                shoesStyle={shoesStyle}
+                outerwearStyle={outerwearStyle}
+                outerwearColor={outerwearColor}
+                outerwearPath={outerwearPath}
+                outerwearStroke={outerwearStroke}
                 accessories={accessories}
               />
             </g>
@@ -545,6 +565,8 @@ function BodySVG({
   skinTone,
   topColor,
   topStyle,
+  dressStyle,
+  dressColor,
   torsoPath,
   torsoStroke,
   shoulder,
@@ -554,11 +576,17 @@ function BodySVG({
   bottomStyle,
   shoesColor,
   shoesStyle,
+  outerwearStyle,
+  outerwearColor,
+  outerwearPath,
+  outerwearStroke,
   accessories,
 }: {
   skinTone: string
   topColor: string
   topStyle?: string
+  dressStyle?: string
+  dressColor?: string
   torsoPath: string
   torsoStroke: string
   shoulder: number
@@ -568,6 +596,10 @@ function BodySVG({
   bottomStyle?: string
   shoesColor: string
   shoesStyle?: string
+  outerwearStyle?: string
+  outerwearColor?: string
+  outerwearPath?: string | null
+  outerwearStroke?: string
   accessories: AccessoryType[]
 }) {
   const centerX = 60
@@ -584,6 +616,8 @@ function BodySVG({
 
   const watch = accessories.find((a) => a.startsWith('watch-') || a === 'bracelet') ?? null
   const necklace = accessories.find((a) => a.startsWith('necklace-')) ?? null
+  const isDress = Boolean(dressStyle)
+  const sleeveStyle = isDress ? getDressSleeveStyle(dressStyle) : topStyle
 
   return (
     <g>
@@ -596,7 +630,7 @@ function BodySVG({
 
       {/* Sleeves based on top style */}
       <SleevesSVG
-        topStyle={topStyle}
+        topStyle={sleeveStyle}
         topColor={topColor}
         leftArmX={leftArmX}
         rightArmX={rightArmX}
@@ -606,24 +640,61 @@ function BodySVG({
 
       {/* Torso */}
       <TorsoSVG
-        topStyle={topStyle}
+        topStyle={sleeveStyle}
         topColor={topColor}
         torsoPath={torsoPath}
         torsoStroke={torsoStroke}
       />
 
+      {isDress && (
+        <path
+          d="M46 104 Q60 108 74 104"
+          stroke={shadeHex(topColor, -0.2)}
+          strokeWidth="1"
+          fill="none"
+          opacity="0.6"
+        />
+      )}
+
       {necklace && <NecklaceSVG necklace={necklace} />}
 
       {/* Legs based on bottom style */}
       <LegsSVG
-        bottomStyle={bottomStyle}
+        bottomStyle={isDress ? undefined : bottomStyle}
         bottomColor={bottomColor}
         leftLegX={leftLegX}
         rightLegX={rightLegX}
         legWidth={legWidth}
+        skinTone={skinTone}
+        forceSkin={isDress}
       />
 
       {/* Shoes based on style */}
+      {isDress && dressColor && (
+        <DressSkirtSVG
+          dressStyle={dressStyle}
+          dressColor={dressColor}
+          torsoStroke={torsoStroke}
+          leftLegX={leftLegX}
+          rightLegX={rightLegX}
+          legWidth={legWidth}
+        />
+      )}
+
+      {outerwearStyle && outerwearColor && outerwearPath && (
+        <OuterwearSVG
+          style={outerwearStyle}
+          color={outerwearColor}
+          stroke={outerwearStroke || shadeHex(outerwearColor, -0.25)}
+          path={outerwearPath}
+          leftArmX={leftArmX}
+          rightArmX={rightArmX}
+          armWidth={armWidth}
+          armY={armY}
+          innerColor={topColor}
+        />
+      )}
+
       <ShoesSVG
         shoesStyle={shoesStyle}
         shoesColor={shoesColor}
@@ -635,6 +706,20 @@ function BodySVG({
       {watch && <WristSVG wrist={watch} leftArmX={leftArmX} armWidth={armWidth} />}
     </g>
   )
+}
+
+function getDressSleeveStyle(style?: string) {
+  switch (style) {
+    case 'sundress':
+    case 'mini-dress':
+      return 'tank-top'
+    case 'formal-dress':
+    case 'maxi-dress':
+      return 'blouse'
+    case 'casual-dress':
+    default:
+      return 'tshirt'
+  }
 }
 
 function SleevesSVG({
@@ -659,7 +744,7 @@ function SleevesSVG({
 
   if (topStyle === 'tank-top' || topStyle === 'crop-top') {
     sleeveLength = 0
-  } else if (topStyle === 'sweater' || topStyle === 'hoodie' || topStyle === 'jacket' || topStyle === 'coat' || topStyle === 'cardigan') {
+  } else if (topStyle === 'sweater' || topStyle === 'hoodie' || topStyle === 'jacket' || topStyle === 'coat' || topStyle === 'cardigan' || topStyle === 'blazer') {
     sleeveLength = 38 // long sleeve
   } else if (topStyle === 'blouse' || topStyle === 'button-shirt') {
     sleeveLength = 32 // 3/4 sleeve
@@ -707,14 +792,51 @@ function TorsoSVG({
       )}
       {topStyle === 'hoodie' && (
         <g>
+          <path d="M46 66 Q60 56 74 66" fill="none" stroke={torsoStroke} strokeWidth="1.6" />
           <path d="M48 68 Q60 78 72 68" fill="none" stroke={torsoStroke} strokeWidth="1.5" />
           {/* Hood strings */}
           <path d="M54 72 L54 85" stroke={torsoStroke} strokeWidth="1" />
           <path d="M66 72 L66 85" stroke={torsoStroke} strokeWidth="1" />
+          <rect x="48" y="92" width="24" height="14" rx="6" fill={shadeHex(topColor, -0.08)} opacity="0.9" />
         </g>
       )}
       {(topStyle === 'tshirt' || topStyle === 'sweater') && (
-        <path d="M52 66 Q60 72 68 66" fill="none" stroke={torsoStroke} strokeWidth="1" />
+        <g>
+          <path d="M52 66 Q60 72 68 66" fill="none" stroke={torsoStroke} strokeWidth="1" />
+          <path d="M46 104 L74 104" stroke={shadeHex(topColor, -0.18)} strokeWidth="1" opacity="0.6" />
+        </g>
+      )}
+      {topStyle === 'blouse' && (
+        <g>
+          <path d="M52 68 L60 78 L68 68" fill="none" stroke={torsoStroke} strokeWidth="1.1" />
+          <path d="M50 78 Q60 86 70 78" fill="none" stroke={shadeHex(topColor, -0.12)} strokeWidth="1" opacity="0.7" />
+        </g>
+      )}
+      {topStyle === 'tank-top' && (
+        <g>
+          <path d="M50 70 Q60 62 70 70" fill="none" stroke={torsoStroke} strokeWidth="1.1" />
+          <path d="M52 74 Q60 68 68 74" fill="none" stroke={shadeHex(topColor, -0.15)} strokeWidth="0.9" opacity="0.6" />
+        </g>
+      )}
+      {topStyle === 'crop-top' && (
+        <path d="M48 102 Q60 106 72 102" fill="none" stroke={torsoStroke} strokeWidth="1" opacity="0.7" />
+      )}
+      {topStyle === 'cardigan' && (
+        <g>
+          <path d="M49 70 L58 120" stroke={torsoStroke} strokeWidth="0.9" opacity="0.6" />
+          <path d="M71 70 L62 120" stroke={torsoStroke} strokeWidth="0.9" opacity="0.6" />
+          <circle cx="60" cy="92" r="1.6" fill={shadeHex(topColor, -0.25)} />
+          <circle cx="60" cy="104" r="1.6" fill={shadeHex(topColor, -0.25)} />
+        </g>
+      )}
+      {(topStyle === 'blazer' || topStyle === 'coat') && (
+        <path d="M50 70 L60 92 L70 70 Z" fill={shadeHex(topColor, -0.12)} opacity="0.9" />
+      )}
+      {topStyle === 'jacket' && (
+        <g>
+          <path d="M60 72 V 120" stroke={torsoStroke} strokeWidth="1.1" />
+          <path d="M50 72 Q60 82 70 72" stroke={torsoStroke} strokeWidth="1.1" fill="none" />
+        </g>
       )}
     </g>
   )
@@ -726,15 +848,31 @@ function LegsSVG({
   leftLegX,
   rightLegX,
   legWidth,
+  skinTone,
+  forceSkin = false,
 }: {
   bottomStyle?: string
   bottomColor: string
   leftLegX: number
   rightLegX: number
   legWidth: number
+  skinTone: string
+  forceSkin?: boolean
 }) {
-  const legHeight = bottomStyle?.includes('short') ? 24 : 44
   const legY = 128
+  const fullLegHeight = 44
+  const isJeans = bottomStyle === 'jeans'
+  const isTrousers = bottomStyle === 'trousers' || bottomStyle === 'dress-pants'
+  const seamColor = shadeHex(bottomColor, isJeans ? -0.35 : -0.25)
+
+  if (forceSkin) {
+    return (
+      <g>
+        <rect x={leftLegX + 2} y={legY} width={legWidth - 4} height={fullLegHeight} rx="6" fill={skinTone} />
+        <rect x={rightLegX + 2} y={legY} width={legWidth - 4} height={fullLegHeight} rx="6" fill={skinTone} />
+      </g>
+    )
+  }
 
   if (bottomStyle?.includes('skirt')) {
     // Skirt rendering
@@ -745,21 +883,178 @@ function LegsSVG({
           d={`M${leftLegX - 4} 128 Q${60} ${128 + skirtLength + 10} ${rightLegX + legWidth + 4} 128`}
           fill={bottomColor}
         />
+        <path
+          d={`M${leftLegX - 2} ${128 + skirtLength} Q60 ${128 + skirtLength + 6} ${rightLegX + legWidth + 2} ${128 + skirtLength}`}
+          stroke={shadeHex(bottomColor, -0.2)}
+          strokeWidth="1"
+          opacity="0.35"
+          fill="none"
+        />
         {/* Legs showing below skirt */}
         {bottomStyle !== 'skirt-long' && (
           <g>
-            <rect x={leftLegX + 2} y={128 + skirtLength - 5} width={legWidth - 4} height={50 - skirtLength} rx="6" fill="#E8C4A8" />
-            <rect x={rightLegX + 2} y={128 + skirtLength - 5} width={legWidth - 4} height={50 - skirtLength} rx="6" fill="#E8C4A8" />
+            <rect x={leftLegX + 2} y={128 + skirtLength - 5} width={legWidth - 4} height={50 - skirtLength} rx="6" fill={skinTone} />
+            <rect x={rightLegX + 2} y={128 + skirtLength - 5} width={legWidth - 4} height={50 - skirtLength} rx="6" fill={skinTone} />
           </g>
         )}
       </g>
     )
   }
 
+  if (bottomStyle?.includes('short')) {
+    const shortsHeight = 18
+    const shortsY = legY
+    const skinY = legY + shortsHeight - 2
+
+    return (
+      <g>
+        <rect x={leftLegX} y={shortsY} width={legWidth} height={shortsHeight} rx="6" fill={bottomColor} />
+        <rect x={rightLegX} y={shortsY} width={legWidth} height={shortsHeight} rx="6" fill={bottomColor} />
+        <rect x={leftLegX + 2} y={skinY} width={legWidth - 4} height={fullLegHeight - shortsHeight + 2} rx="6" fill={skinTone} />
+        <rect x={rightLegX + 2} y={skinY} width={legWidth - 4} height={fullLegHeight - shortsHeight + 2} rx="6" fill={skinTone} />
+      </g>
+    )
+  }
+
   return (
     <g>
-      <rect x={leftLegX} y={legY} width={legWidth} height={legHeight} rx="8" fill={bottomColor} />
-      <rect x={rightLegX} y={legY} width={legWidth} height={legHeight} rx="8" fill={bottomColor} />
+      <rect x={leftLegX} y={legY} width={legWidth} height={fullLegHeight} rx="8" fill={bottomColor} />
+      <rect x={rightLegX} y={legY} width={legWidth} height={fullLegHeight} rx="8" fill={bottomColor} />
+      <path d={`M${leftLegX + legWidth / 2} ${legY + 4} V ${legY + fullLegHeight - 4}`} stroke={seamColor} strokeWidth="1" opacity="0.5" />
+      <path d={`M${rightLegX + legWidth / 2} ${legY + 4} V ${legY + fullLegHeight - 4}`} stroke={seamColor} strokeWidth="1" opacity="0.5" />
+      {isJeans && (
+        <g>
+          <path d={`M${leftLegX + 1} ${legY + 6} Q${leftLegX + 6} ${legY + 12} ${leftLegX + 12} ${legY + 8}`} stroke={seamColor} strokeWidth="1" fill="none" opacity="0.6" />
+          <path d={`M${rightLegX + legWidth - 1} ${legY + 6} Q${rightLegX + legWidth - 6} ${legY + 12} ${rightLegX + legWidth - 12} ${legY + 8}`} stroke={seamColor} strokeWidth="1" fill="none" opacity="0.6" />
+          <path d={`M${leftLegX + 2} ${legY + 2} L${rightLegX + legWidth - 2} ${legY + 2}`} stroke={seamColor} strokeWidth="1" opacity="0.4" />
+        </g>
+      )}
+      {isTrousers && (
+        <g>
+          <path d={`M${leftLegX + 2} ${legY + 6} L${leftLegX + legWidth - 2} ${legY + 6}`} stroke={seamColor} strokeWidth="1" opacity="0.35" />
+          <path d={`M${rightLegX + 2} ${legY + 6} L${rightLegX + legWidth - 2} ${legY + 6}`} stroke={seamColor} strokeWidth="1" opacity="0.35" />
+        </g>
+      )}
+    </g>
+  )
+}
+
+function DressSkirtSVG({
+  dressStyle,
+  dressColor,
+  torsoStroke,
+  leftLegX,
+  rightLegX,
+  legWidth,
+}: {
+  dressStyle?: string
+  dressColor: string
+  torsoStroke: string
+  leftLegX: number
+  rightLegX: number
+  legWidth: number
+}) {
+  const length =
+    dressStyle === 'maxi-dress'
+      ? 56
+      : dressStyle === 'formal-dress'
+      ? 44
+      : dressStyle === 'sundress'
+      ? 36
+      : dressStyle === 'mini-dress'
+      ? 22
+      : 30
+
+  const waistY = 118
+  const hemY = waistY + length
+  const leftX = leftLegX - 6
+  const rightX = rightLegX + legWidth + 6
+  const flare = dressStyle === 'sundress' ? 12 : 8
+
+  return (
+    <g>
+      <path
+        d={`M${leftX} ${waistY} Q60 ${hemY + flare} ${rightX} ${waistY} Z`}
+        fill={dressColor}
+        stroke={torsoStroke}
+        strokeWidth="0.8"
+      />
+      <path
+        d={`M${leftX + 6} ${waistY + 8} Q60 ${hemY - 4} ${rightX - 6} ${waistY + 8}`}
+        stroke={shadeHex(dressColor, -0.2)}
+        strokeWidth="1"
+        opacity="0.35"
+        fill="none"
+      />
+    </g>
+  )
+}
+
+function OuterwearSVG({
+  style,
+  color,
+  stroke,
+  path,
+  leftArmX,
+  rightArmX,
+  armWidth,
+  armY,
+  innerColor,
+}: {
+  style: string
+  color: string
+  stroke: string
+  path: string
+  leftArmX: number
+  rightArmX: number
+  armWidth: number
+  armY: number
+  innerColor: string
+}) {
+  const sleeveLength = style === 'blazer' ? 32 : 38
+  const panelShade = shadeHex(color, -0.08)
+  const lapelColor = shadeHex(color, -0.16)
+
+  return (
+    <g>
+      <rect x={leftArmX - 1} y={armY - 2} width={armWidth + 2} height={sleeveLength} rx={armWidth / 2 + 1} fill={color} />
+      <rect x={rightArmX - 1} y={armY - 2} width={armWidth + 2} height={sleeveLength} rx={armWidth / 2 + 1} fill={color} />
+      <path d={path} fill={color} stroke={stroke} strokeWidth="0.9" />
+
+      {(style === 'blazer' || style === 'coat') && (
+        <g>
+          <path d="M50 70 L60 94 L70 70 Z" fill={lapelColor} opacity="0.9" />
+          <path d="M60 72 V 138" stroke={stroke} strokeWidth="1" opacity="0.7" />
+        </g>
+      )}
+
+      {style === 'cardigan' && (
+        <g>
+          <path d="M48 70 L58 132" stroke={stroke} strokeWidth="1" opacity="0.6" />
+          <path d="M72 70 L62 132" stroke={stroke} strokeWidth="1" opacity="0.6" />
+          <circle cx="60" cy="96" r="1.8" fill={stroke} opacity="0.6" />
+          <circle cx="60" cy="108" r="1.8" fill={stroke} opacity="0.6" />
+        </g>
+      )}
+
+      {style === 'jacket' && (
+        <g>
+          <path d="M60 72 V 124" stroke={stroke} strokeWidth="1.2" />
+          <path d="M50 72 Q60 82 70 72" stroke={stroke} strokeWidth="1.2" fill="none" />
+        </g>
+      )}
+
+      {style === 'coat' && (
+        <g>
+          <rect x="46" y="108" width="10" height="10" rx="2" fill={lapelColor} opacity="0.6" />
+          <rect x="64" y="108" width="10" height="10" rx="2" fill={lapelColor} opacity="0.6" />
+          <circle cx="60" cy="96" r="1.6" fill={stroke} opacity="0.6" />
+          <circle cx="60" cy="108" r="1.6" fill={stroke} opacity="0.6" />
+        </g>
+      )}
+
+      <path d="M49 72 Q60 82 71 72" stroke={panelShade} strokeWidth="2" opacity="0.25" />
+      <path d="M52 76 L56 126" stroke={shadeHex(innerColor, -0.1)} strokeWidth="2" opacity="0.2" />
     </g>
   )
 }
@@ -789,6 +1084,8 @@ function ShoesSVG({
           {/* Heels */}
           <rect x={leftCenterX - 2} y="172" width="4" height="6" fill={shoesColor} />
           <rect x={rightCenterX - 2} y="172" width="4" height="6" fill={shoesColor} />
+          <path d={`M${leftCenterX - 6} 170 Q${leftCenterX} 166 ${leftCenterX + 6} 170`} stroke={shadeHex(shoesColor, -0.25)} strokeWidth="1.2" fill="none" />
+          <path d={`M${rightCenterX - 6} 170 Q${rightCenterX} 166 ${rightCenterX + 6} 170`} stroke={shadeHex(shoesColor, -0.25)} strokeWidth="1.2" fill="none" />
         </g>
       )
     case 'boots':
@@ -816,6 +1113,12 @@ function ShoesSVG({
           {/* Sneaker details */}
           <ellipse cx={leftCenterX + 4} cy="172" rx="4" ry="2" fill="white" opacity="0.3" />
           <ellipse cx={rightCenterX + 4} cy="172" rx="4" ry="2" fill="white" opacity="0.3" />
+          <path d={`M${leftCenterX - 10} 174 Q${leftCenterX} 178 ${leftCenterX + 10} 174`} stroke={shadeHex(shoesColor, -0.3)} strokeWidth="1.2" fill="none" opacity="0.7" />
+          <path d={`M${rightCenterX - 10} 174 Q${rightCenterX} 178 ${rightCenterX + 10} 174`} stroke={shadeHex(shoesColor, -0.3)} strokeWidth="1.2" fill="none" opacity="0.7" />
+          <circle cx={leftCenterX - 2} cy="170.5" r="0.8" fill="white" opacity="0.7" />
+          <circle cx={leftCenterX + 2} cy="169.8" r="0.8" fill="white" opacity="0.7" />
+          <circle cx={rightCenterX - 2} cy="170.5" r="0.8" fill="white" opacity="0.7" />
+          <circle cx={rightCenterX + 2} cy="169.8" r="0.8" fill="white" opacity="0.7" />
         </g>
       )
   }
@@ -1201,6 +1504,36 @@ function getTorsoPath(body: BodySpec) {
   const shoulderHalf = body.shoulder / 2
   const waistHalf = body.waist / 2
   const hipsHalf = body.hips / 2
+
+  const leftShoulderX = centerX - shoulderHalf
+  const rightShoulderX = centerX + shoulderHalf
+  const leftWaistX = centerX - waistHalf
+  const rightWaistX = centerX + waistHalf
+  const leftHipX = centerX - hipsHalf
+  const rightHipX = centerX + hipsHalf
+
+  return [
+    `M ${leftShoulderX} ${topY}`,
+    `Q ${leftShoulderX - 2} ${topY + 18} ${leftWaistX} ${waistY}`,
+    `Q ${leftHipX} ${hipY} ${leftHipX} ${bottomY}`,
+    `L ${rightHipX} ${bottomY}`,
+    `Q ${rightHipX} ${hipY} ${rightWaistX} ${waistY}`,
+    `Q ${rightShoulderX + 2} ${topY + 18} ${rightShoulderX} ${topY}`,
+    'Z',
+  ].join(' ')
+}
+
+function getOuterwearPath(body: BodySpec, style: string) {
+  const centerX = 60
+  const topY = 66
+  const waistY = 104
+  const hipY = 126
+  const extraLength = style === 'coat' ? 36 : style === 'blazer' ? 18 : 14
+  const bottomY = 128 + extraLength
+
+  const shoulderHalf = body.shoulder / 2 + 3
+  const waistHalf = body.waist / 2 + 4
+  const hipsHalf = body.hips / 2 + 6
 
   const leftShoulderX = centerX - shoulderHalf
   const rightShoulderX = centerX + shoulderHalf

@@ -23,49 +23,25 @@ interface AvatarStylePickerProps {
 const TOP_STYLES: { style: AvatarTopStyle; label: string }[] = [
   { style: 'tshirt', label: 'T-Shirt' },
   { style: 'blouse', label: 'Blouse' },
-  { style: 'sweater', label: 'Sweater' },
   { style: 'hoodie', label: 'Hoodie' },
-  { style: 'tank-top', label: 'Tank Top' },
-  { style: 'polo', label: 'Polo' },
-  { style: 'button-shirt', label: 'Button Shirt' },
-  { style: 'crop-top', label: 'Crop Top' },
-  { style: 'cardigan', label: 'Cardigan' },
 ]
 
 const OUTERWEAR_STYLES: { style: AvatarTopStyle; label: string }[] = [
   { style: 'blazer', label: 'Blazer' },
-  { style: 'jacket', label: 'Jacket' },
-  { style: 'coat', label: 'Coat' },
-  { style: 'cardigan', label: 'Cardigan' },
 ]
 
 const BOTTOM_STYLES: { style: AvatarBottomStyle; label: string }[] = [
   { style: 'jeans', label: 'Jeans' },
-  { style: 'trousers', label: 'Trousers' },
-  { style: 'shorts', label: 'Shorts' },
-  { style: 'skirt-short', label: 'Short Skirt' },
   { style: 'skirt-midi', label: 'Midi Skirt' },
-  { style: 'skirt-long', label: 'Long Skirt' },
-  { style: 'leggings', label: 'Leggings' },
-  { style: 'joggers', label: 'Joggers' },
-  { style: 'dress-pants', label: 'Dress Pants' },
 ]
 
 const DRESS_STYLES: { style: AvatarDressStyle; label: string }[] = [
-  { style: 'casual-dress', label: 'Casual Dress' },
-  { style: 'formal-dress', label: 'Formal Dress' },
-  { style: 'maxi-dress', label: 'Maxi Dress' },
-  { style: 'mini-dress', label: 'Mini Dress' },
   { style: 'sundress', label: 'Sundress' },
 ]
 
 const SHOE_STYLES: { style: AvatarShoeStyle; label: string }[] = [
   { style: 'sneakers', label: 'Sneakers' },
-  { style: 'boots', label: 'Boots' },
   { style: 'heels', label: 'Heels' },
-  { style: 'flats', label: 'Flats' },
-  { style: 'sandals', label: 'Sandals' },
-  { style: 'loafers', label: 'Loafers' },
 ]
 
 function getStyleOptions(clothingType: string): { style: string; label: string }[] {

@@ -9,6 +9,100 @@
 
 ---
 
+## 2025-12-26 - Session 7: Outfit display + city settings + avatar polish
+
+**Duration:** ~1.5 hours
+**Developer:** Claude Opus 4.5
+
+### Accomplished
+- [x] Replaced AvatarDisplay with OutfitDisplay on home page (avatar hidden from regular users)
+- [x] Created OutfitDisplay component showing outerwear/top/bottom/shoes slots
+- [x] Added city/country fields to UserPreferences schema for weather data
+- [x] Added city input to registration flow
+- [x] Added city setting in profile settings
+- [x] Enhanced AvatarDisplay with outerwear layer support (coat, blazer, cardigan, jacket)
+- [x] Improved dress rendering with skirt layers
+- [x] Added detailed shoe styles (sneakers, boots, heels, flats, sandals, loafers)
+- [x] Added leg rendering for skirts/shorts showing skin tone
+
+### Decisions Made
+- **Avatar for admin only:** Avatar system is still work-in-progress, so only shown to admin users
+- **OutfitDisplay for users:** Regular users see clothing images in slots instead of avatar
+- **City-based weather:** Added city field to enable accurate weather-based outfit suggestions
+
+### Problems & Solutions
+- **Problem:** None encountered
+- **Solution:** N/A
+
+### Files Changed
+- `prisma/schema.prisma` - Added city/country fields to UserPreferences
+- `src/app/(auth)/register/page.tsx` - Added city input field
+- `src/app/(main)/home/HomeClient.tsx` - Replaced avatar with OutfitDisplay
+- `src/app/(main)/profile/ProfileClient.tsx` - Added city setting
+- `src/components/outfit/OutfitDisplay.tsx` - New component for clothing display
+- `src/components/outfit/index.ts` - Export file
+- `src/components/avatar/AvatarDisplay.tsx` - Enhanced outerwear/dress/shoe rendering
+- `src/components/avatar/AvatarStylePicker.tsx` - Updated for basic pack
+
+### Notes
+- OutfitDisplay slots redirect to wardrobe for item selection (to be wired up)
+- Weather API integration still needed for city-based suggestions
+
+---
+
+## 2025-12-26 - Session 6: Avatar basic pack + improved detail pass
+
+**Duration:** ~1 hour
+**Developer:** Codex CLI (GPT-5)
+
+### Accomplished
+- [x] Reduced avatar style picker to the requested basic pack (3 tops, 2 bottoms, 1 dress, 1 outerwear, 2 shoes)
+- [x] Enhanced torso/hoodie/blouse/tank details for a cleaner cartoon look
+- [x] Added jeans/trouser detailing, skirt hem lines, and shoe refinements
+- [x] Added coat pocket details and improved outerwear polish
+
+### Decisions Made
+- **Basic pack selection:** T-shirt, blouse, hoodie; jeans + midi skirt; sundress; blazer; sneakers + heels
+
+### Problems & Solutions
+- **Problem:** None encountered
+- **Solution:** N/A
+
+### Files Changed
+- `src/components/avatar/AvatarDisplay.tsx` - Clothing detail pass for the basic pack
+- `src/components/avatar/AvatarStylePicker.tsx` - Reduce style options to basic pack
+
+### Notes
+- For higher fidelity, we should lock a visual reference and replace shapes with custom assets
+
+---
+
+## 2025-12-26 - Session 5: Avatar outfit layering + style polish
+
+**Duration:** ~1.5 hours
+**Developer:** Codex CLI (GPT-5)
+
+### Accomplished
+- [x] Added dress + outerwear rendering layers to the avatar renderer
+- [x] Improved leg rendering (skin tone for skirts/shorts, dress legs, seams)
+- [x] Added new clothing detail cues (lapels, waistline, cardigan buttons)
+- [x] Added outerwear path helper for coat/blazer lengths
+
+### Decisions Made
+- **Basic pack first:** Implemented foundational shapes and layering now; higher-fidelity assets can replace these later
+
+### Problems & Solutions
+- **Problem:** None encountered
+- **Solution:** N/A
+
+### Files Changed
+- `src/components/avatar/AvatarDisplay.tsx` - Dress/outerwear layers, leg updates, clothing details, outerwear path helper
+
+### Notes
+- Patterns and higher-detail assets still pending; this is a baseline for the custom style
+
+---
+
 ## 2025-12-25 - Session 4: Attempted local verification (db push + dev server)
 
 **Duration:** ~0.25 hours
