@@ -8,6 +8,7 @@ import { Button, Input, Card } from '@/components/ui'
 export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [city, setCity] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +39,7 @@ export default function RegisterPage() {
       options: {
         data: {
           name,
+          city,
         },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -127,6 +129,15 @@ export default function RegisterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+          />
+
+          <Input
+            label="City"
+            type="text"
+            placeholder="e.g., Oslo, London, New York"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            helperText="For accurate weather-based outfit suggestions"
           />
 
           <Input

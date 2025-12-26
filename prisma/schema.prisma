@@ -185,6 +185,8 @@ model UserPreferences {
   id                     String   @id @default(cuid())
   userId                 String   @unique
   user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city                   String?  // User's city for weather data
+  country                String?  // User's country code (e.g., "NO", "US")
   notificationTime       String   @default("05:00")
   enableNotifications    Boolean  @default(true)
   enableSustainability   Boolean  @default(true)

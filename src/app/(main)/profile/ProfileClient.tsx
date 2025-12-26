@@ -111,6 +111,22 @@ export default function ProfileClient({ user }: ProfileClientProps) {
           <Card className="mb-6">
             <h3 className="text-lg font-semibold text-charcoal mb-4">Settings</h3>
             <div className="space-y-4">
+              {/* Location Settings */}
+              <div className="pb-4 border-b border-beige">
+                <label className="block text-sm font-medium text-charcoal mb-2">
+                  Your City
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Oslo, London, New York"
+                  defaultValue={user.user_metadata?.city || ''}
+                  className="w-full px-3 py-2 rounded-lg border border-beige bg-white text-charcoal placeholder:text-taupe/60 focus:outline-none focus:ring-2 focus:ring-rose focus:border-transparent"
+                />
+                <p className="mt-1 text-xs text-taupe">
+                  Used for weather-based outfit suggestions
+                </p>
+              </div>
+
               <SettingToggle
                 label="Push Notifications"
                 description="Daily outfit reminders at 5:00 AM"

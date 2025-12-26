@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Card } from '@/components/ui'
-import AvatarDisplay from '@/components/avatar/AvatarDisplay'
-import { useAvatar } from '@/hooks/useAvatar'
+import { OutfitDisplay } from '@/components/outfit'
+import { isAdminEmail } from '@/lib/admin'
 
 interface HomeClientProps {
   user: User
@@ -16,7 +16,25 @@ interface HomeClientProps {
 export default function HomeClient({ user }: HomeClientProps) {
   const router = useRouter()
   const [currentDay, setCurrentDay] = useState<'today' | 'tomorrow'>('today')
-  const { avatar, isLoading: isAvatarLoading } = useAvatar()
+  const isAdmin = isAdminEmail(user.email || '')
+
+  // TODO: Fetch actual outfit data from wardrobe
+  const [selectedOutfit, setSelectedOutfit] = useState<{
+    outerwear: null
+    top: null
+    bottom: null
+    shoes: null
+  }>({
+    outerwear: null,
+    top: null,
+    bottom: null,
+    shoes: null,
+  })
+
+  const handleSlotClick = (slot: 'outerwear' | 'top' | 'bottom' | 'shoes') => {
+    // TODO: Open wardrobe picker modal for this slot
+    router.push(`/wardrobe?select=${slot}`)
+  }
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -103,67 +121,68 @@ export default function HomeClient({ user }: HomeClientProps) {
         </div>
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Avatar Section */}
-          <div className="lg:col-span-2">
-            <Card variant="elevated" className="h-full">
-              <div className="flex flex-col items-center">
-                <h2 className="text-lg font-semibold text-charcoal mb-4">
-                  Your Outfit for {currentDay === 'today' ? 'Today' : 'Tomorrow'}
-                </h2>
-                <AvatarDisplay
-                  skinTone={avatar?.skinTone}
-                  hairColor={avatar?.hairColor}
-                  hairHighlights={avatar?.hairHighlights}
-                  hairStyle={avatar?.hairStyle}
-                  eyeColor={avatar?.eyeColor}
-                  faceShape={avatar?.faceShape}
-                  bodyType={avatar?.bodyType}
-                  height={avatar?.height}
-                  accessories={avatar?.accessories}
-                />
-                {!isAvatarLoading && !avatar && (
-                  <div className="mt-4 text-center">
-                    <p className="text-sm text-taupe mb-3">
-                      Create your avatar to see outfits on you.
-                    </p>
-                    <Link href="/profile/avatar">
-                      <Button variant="outline" size="sm">
-                        Create avatar
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-                <div className="flex gap-4 mt-6">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M23 4v6h-6M1 20v-6h6" />
-                      <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-                    </svg>
-                    Shuffle
-                  </Button>
-                  <Button className="flex items-center gap-2">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                    </svg>
-                    Surprise Me!
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
+        <div className="flex flex-col items-center gap-8">
+          {/* Outfit Display Section */}
+          <Card variant="elevated" className="w-full max-w-md">
+            <div className="flex flex-col items-center py-4">
+              <h2 className="text-lg font-semibold text-charcoal mb-6">
+                Your Outfit for {currentDay === 'today' ? 'Today' : 'Tomorrow'}
+              </h2>
 
-          {/* Outfit Items */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-charcoal">Outfit Items</h3>
-            <OutfitItemCard type="Top" empty />
-            <OutfitItemCard type="Bottom" empty />
-            <OutfitItemCard type="Shoes" empty />
-            <OutfitItemCard type="Accessory" empty />
+              <OutfitDisplay
+                outerwear={selectedOutfit.outerwear}
+                top={selectedOutfit.top}
+                bottom={selectedOutfit.bottom}
+                shoes={selectedOutfit.shoes}
+                onSlotClick={handleSlotClick}
+              />
+
+              <p className="text-sm text-taupe mt-6 text-center">
+                Tap any slot to select clothing from your wardrobe
+              </p>
+
+              <div className="flex gap-4 mt-6">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M23 4v6h-6M1 20v-6h6" />
+                    <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                  </svg>
+                  Shuffle
+                </Button>
+                <Button className="flex items-center gap-2">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  Surprise Me!
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="w-full max-w-md grid grid-cols-2 gap-4">
             <Link href="/wardrobe">
-              <Button variant="outline" className="w-full mt-4">
-                Add clothes to your wardrobe
-              </Button>
+              <Card className="flex flex-col items-center gap-2 py-6 hover:bg-blush/30 transition-colors cursor-pointer">
+                <div className="w-12 h-12 bg-blush rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M3 9h18M9 21V9" />
+                  </svg>
+                </div>
+                <span className="font-medium text-charcoal">Wardrobe</span>
+                <span className="text-xs text-taupe">Manage clothes</span>
+              </Card>
+            </Link>
+            <Link href="/wardrobe">
+              <Card className="flex flex-col items-center gap-2 py-6 hover:bg-blush/30 transition-colors cursor-pointer">
+                <div className="w-12 h-12 bg-blush rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </div>
+                <span className="font-medium text-charcoal">Add Item</span>
+                <span className="text-xs text-taupe">Scan or upload</span>
+              </Card>
             </Link>
           </div>
         </div>
@@ -180,38 +199,6 @@ export default function HomeClient({ user }: HomeClientProps) {
         </div>
       </nav>
     </div>
-  )
-}
-
-function OutfitItemCard({ type, empty = false }: { type: string; empty?: boolean }) {
-  return (
-    <Card padding="sm" className="flex items-center gap-4">
-      <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${
-        empty ? 'bg-blush/50 border-2 border-dashed border-rose/30' : 'bg-blush'
-      }`}>
-        {empty ? (
-          <svg className="w-6 h-6 text-rose/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        ) : (
-          <span className="text-rose text-2xl">👕</span>
-        )}
-      </div>
-      <div className="flex-1">
-        <p className="font-medium text-charcoal">{type}</p>
-        <p className="text-sm text-taupe">
-          {empty ? 'No item selected' : 'Selected item'}
-        </p>
-      </div>
-      {!empty && (
-        <button className="p-2 hover:bg-blush rounded-full transition-colors">
-          <svg className="w-4 h-4 text-taupe" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0110 0v4" />
-          </svg>
-        </button>
-      )}
-    </Card>
   )
 }
 
